@@ -1,5 +1,5 @@
 .container {
-  @apply drawer w-max
+  @apply drawer w-max z-50
 }
 
 .drawerButton {

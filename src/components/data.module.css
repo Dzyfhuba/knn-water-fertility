@@ -2,6 +2,6 @@
   @apply overflow-x-scroll
 }
 
-.title {
-  @apply text-xl font-bold underline
+.loadingContainer {
+  @apply w-screen h-[60vh] flex justify-center content-center
 }
