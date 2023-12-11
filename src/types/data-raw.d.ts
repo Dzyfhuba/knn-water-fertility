@@ -1,3 +1,5 @@
+import { Label } from '@/variables/knn'
+
 namespace DataRaw {
   interface Select {
     id: number,
@@ -5,6 +7,8 @@ namespace DataRaw {
     fosfat: number,
     kelas: string,
     kelasPredict?: string,
+    distance?: number,
+    distances?: {label: Label, distance: number}[],
     updated_at: string,
     created_at: string,
   }

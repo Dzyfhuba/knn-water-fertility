@@ -35,7 +35,7 @@ const Train = () => {
 
   return (
     <>
-      <h1 className={globalStyles.title}>Data</h1>
+      <h1 className={globalStyles.title}>Title</h1>
       {
         data.length ? (
           <>

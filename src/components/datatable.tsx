@@ -1,5 +1,6 @@
 import DataRaw from '@/types/data-raw'
 import Time from '@/variables/time'
+import withReactContent from 'sweetalert2-react-content'
 import {
   Body,
   Cell,
@@ -18,16 +19,21 @@ import {
 } from '@table-library/react-table-library/sort'
 import styles from './datatable.module.css'
 import { MiddlewareFunction } from '@table-library/react-table-library/types/common'
+import Swal from 'sweetalert2'
+import SweetalertParams from '@/variables/sweetalert2'
+import { MdDownload } from 'react-icons/md'
+import downloadAsCSV from '@/variables/download'
 
 type Props = {
   tableData: Data<TableNode & DataRaw.Select>
+  downloadable?: boolean
 }
 
 const DataTable = (props: Props) => {
   const theme = useTheme({
     Table: `
-        --data-table-library_grid-template-columns: 25% 25% 25% 25%;
-        min-width: 400px;
+        --data-table-library_grid-template-columns: 35% 35% 35% 35% 35% 35% 35% 35%;
+        min-width: 600px;
       `,
     BaseCell: `
         border-bottom-width: 1px;
@@ -64,6 +70,8 @@ const DataTable = (props: Props) => {
       FERTILITY: (array) => array.sort((a, b) => a.kelas.localeCompare(b.kelas)),
       // @ts-ignore 
       FERTILITY_PREDICT: (array) => array.sort((a, b) => a.kelasPerdict.localeCompare(b.kelasPerdict)),
+      // @ts-ignore
+      DISTANCE: (array) => array.sort((a, b) => a.distance - b.distance),
       // @ts-ignore 
       CREATED_AT: (array) => array.sort((a, b) => a.created_at - b.created_at),
       // @ts-ignore 
@@ -71,9 +79,23 @@ const DataTable = (props: Props) => {
     }
   })
 
+  const ReactSwal = withReactContent(Swal)
 
   return (
     <div className={styles.container}>
+      <button 
+        className={styles.downloadButton}
+        onClick={() => {
+          // exclude distances
+          const data = props.tableData.nodes.map(item => {
+            const { distances, ...rest } = item
+            return rest
+          })
+          downloadAsCSV(data, 'data.csv')
+        }}
+      >
+        <MdDownload size={24} />
+      </button>
       <Table data={props.tableData} theme={theme} sort={sort}>
         {(tableList: DataRaw.Select[]) => (
           <>
@@ -90,13 +112,78 @@ const DataTable = (props: Props) => {
                       <HeaderCellSort sortKey='FERTILITY_PREDICT' resize>Fertility Predict</HeaderCellSort>
                     ) : <></>
                 }
+                {
+                  // tableList has distance
+                  tableList[0]?.distance !== undefined
+                    ? (
+                      <HeaderCellSort sortKey='DISTANCE' resize>Distance</HeaderCellSort>
+                    ) : <></>
+                }
                 <HeaderCellSort sortKey='CREATED_AT' resize hide>Created At</HeaderCellSort>
                 <HeaderCellSort sortKey='UPDATED_AT' resize hide>Updated At</HeaderCellSort>
               </HeaderRow>
             </Header>
             <Body>
               {tableList.map(item => (
-                <Row key={item.id} item={item}>
+                <Row
+                  key={item.id}
+                  item={item}
+                  onClick={() => {
+                    ReactSwal.fire({
+                      title: 'Data',
+                      html: (
+                        <>
+                          <div className={styles.sweetAlertGrid}>
+                            <span>ID:</span> <span>{item.id}</span>
+                            <span>Klorofil A:</span> <span>{item.chlo_a}</span>
+                            <span>Fosfat:</span> <span>{item.fosfat}</span>
+                            <span>Kelas:</span> <span>{item.kelas}</span>
+                            {
+                              // has kelasPredict
+                              item.kelasPredict ? (
+                                <>
+                                  <span>Kelas Prediksi:</span> <span>{item.kelasPredict}</span>
+                                </>
+                              ) : <></>
+                            }
+                            {
+                              // has distance
+                              item.distance ? (
+                                <>
+                                  <span>Jarak:</span> <span>{item.distance}</span>
+                                </>
+                              ) : <></>
+                            }
+                            <span>Dibuat:</span> <span>{Time.format(item.created_at)}</span>
+                            <span>Diubah:</span> <span>{Time.format(item.updated_at)}</span>
+                          </div>
+                          <table className={styles.sweetAlertTable}>
+                            <thead>
+                              <tr>
+                                <th>Label</th>
+                                <th>Distance</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {
+                                item.distances?.length ? (
+                                  item.distances.map((distance, idx) => (
+                                    <tr key={idx}>
+                                      <td>{distance.label}</td>
+                                      <td>{distance.distance}</td>
+                                    </tr>
+                                  ))
+                                ) : <></>
+                              }
+                            </tbody>
+                          </table>
+                        </>
+                      ),
+                      ...SweetalertParams.info
+                    })
+                  }}
+                  className='hover:cursor-pointer'
+                >
                   <Cell pinLeft>{item.id}</Cell>
                   <Cell>{item.chlo_a}</Cell>
                   <Cell>{item.fosfat}</Cell>
@@ -105,6 +192,12 @@ const DataTable = (props: Props) => {
                     // has kelasPredict
                     item.kelasPredict ? (
                       <Cell>{item.kelasPredict}</Cell>
+                    ) : <></>
+                  }
+                  {
+                    // has distance
+                    item.distance ? (
+                      <Cell>{item.distance}</Cell>
                     ) : <></>
                   }
                   <Cell hide>{Time.format(item.created_at)}</Cell>

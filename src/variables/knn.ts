@@ -1,5 +1,14 @@
 type Feature = number[]
 export type Label = 'Eutrofik' | 'Oligotrofik' | 'Mesotrofik'
+
+export type KNNReturnType = {
+  predictions: {
+    label: Label
+    distance: number
+    distances: {label: Label, distance: number}[]
+  }[]
+}
+
 export type ConfusionMatrix = {
   TP?: number
   TN?: number
@@ -64,7 +73,7 @@ class KNN {
   }
 
   // predict label
-  public predict(features: Feature[]): Label[] {
+  public predict(features: Feature[]): KNNReturnType {
     if (!this.features || !this.labels) {
       throw new Error('train the model first')
     }
@@ -78,10 +87,16 @@ class KNN {
 
       const kNearestLabels = sortedDistances.slice(0, this.k).map((d) => d.label)
 
-      return this.majorityVote(kNearestLabels)
+      return {
+        label: this.majorityVote(kNearestLabels),
+        distance: sortedDistances[0].distance,
+        distances: sortedDistances,
+      }
     })
 
-    return predictions
+    console.log(predictions)
+
+    return {predictions}
   }
 
   // calculate accuracy using confusion matrix

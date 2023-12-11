@@ -1,5 +1,6 @@
 'use client'
 import { useStoreState } from '@/state/hooks'
+import globalStyles from '@/app/global.module.css'
 import KNN, { ConfusionMatrix, Label } from '@/variables/knn'
 import styles from './test.module.css'
 import { useEffect, useState } from 'react'
@@ -21,10 +22,12 @@ const Test = () => {
   useEffect(() => {
     const dataTestXYPredict = localStorage.getItem('dataTestXYPredict')
     const confustionMatrix = localStorage.getItem('confustionMatrix')
+    const trainData = localStorage.getItem('trainData')
 
-    if (dataTestXYPredict && confustionMatrix) {
+    if (dataTestXYPredict && confustionMatrix && trainData) {
       setCalculatedData(JSON.parse(dataTestXYPredict))
       setConfustionMatrix(JSON.parse(confustionMatrix))
+      setDataTrain(JSON.parse(trainData))
     }
   }, [])
 
@@ -80,12 +83,6 @@ const Test = () => {
           }
         })
 
-        // console.log({dataTrainX})
-        // console.log({dataTrainY})
-
-        // console.log({dataTestX})
-        // console.log({dataTestY})
-
         // KNN
         const model = new KNN(1)
         model.train(dataTrainX, dataTrainY)
@@ -110,16 +107,18 @@ const Test = () => {
             chlo_a: item.chlo_a,
             fosfat: item.fosfat,
             kelas: item.kelas,
-            kelasPredict: predictions[index],
+            kelasPredict: predictions.predictions[index].label,
+            distance: predictions.predictions[index].distance,
+            distances: predictions.predictions[index].distances,
             created_at: dataTestRest[index].created_at,
             updated_at: dataTestRest[index].updated_at,
           }
         })
 
-        // console.log({dataTestXYPredict})
+        console.log({dataTestXYPredict})
 
         // calculate confusion matrix
-        const confustionMatrix = model.confusionMatrix(dataTestY, predictions)
+        const confustionMatrix = model.confusionMatrix(dataTestY, predictions.predictions.map(item => item.label))
 
         // console.log({confustionMatrix})
 
@@ -132,6 +131,7 @@ const Test = () => {
         // store dataTestXYPredict and confustionMatrix to localStorage
         localStorage.setItem('dataTestXYPredict', JSON.stringify(dataTestXYPredict))
         localStorage.setItem('confustionMatrix', JSON.stringify(confustionMatrix))
+        localStorage.setItem('trainData', JSON.stringify(dataTrain))
       }
 
     } catch (error) {
@@ -149,13 +149,13 @@ const Test = () => {
 
   return (
     <div>
-      <h1>Test</h1>
+      <h1 className={globalStyles.title}>Test</h1>
 
       <button
         onClick={handlePredict}
         className={styles.testButton}
       >
-        Predict
+        Predict With Test Data
       </button>
 
       <p>Tabel {indexTrain.map(i => i+1).join('-')} sebagai train.</p>

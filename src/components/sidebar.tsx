@@ -46,7 +46,7 @@ const Sidebar = () => {
             </NavLink>
           </li>
           <li>
-            <NavLink href={'/predicts'} inputId='my-drawer'>
+            <NavLink href={'/predict'} inputId='my-drawer'>
               Data Prediksi
             </NavLink>
           </li>

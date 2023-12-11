@@ -8,8 +8,16 @@ interface Params {
 const SweetalertParams: Params = {
   error: {
     confirmButtonColor: Colors.error,
+    icon: 'error',
     title: 'Error',
     confirmButtonText: 'Close'
+  },
+  info: {
+    confirmButtonColor: Colors.info,
+    icon: 'info',
+    title: 'Info',
+    confirmButtonText: 'Close',
+    showCloseButton: true
   }
 }
 
