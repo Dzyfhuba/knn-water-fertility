@@ -1,7 +1,14 @@
+import Client from '@/components/client'
+import Predicts from '@/components/predicts'
+
 const PredictsPage = () => {
+  
+  
   return (
     <div>
-      <h1>Predicts</h1>
+      <Client>
+        <Predicts />
+      </Client>
     </div>
   )
 }

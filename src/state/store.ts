@@ -36,7 +36,7 @@ const store = createStore<GlobalState>({
     return data
   }),
 
-  dataPartial: [],
+  dataPartial: typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('dataPartial') || '[]') : [],
   setDataPartial: action((state, payload) => {
     state.dataPartial = payload
   }),
@@ -48,18 +48,18 @@ const store = createStore<GlobalState>({
     const dataPartial = []
     const dataLength = data.length
     const dataLengthPerPart = Math.floor(dataLength / 4)
-    let dataPart = []
-    for (let i = 0; i < dataLength; i++) {
-      dataPart.push(data[i])
-      if (i % dataLengthPerPart === 0 && i !== 0) {
-        // dataPart sort by id
-        dataPart.sort((a, b) => a.id - b.id)
-        dataPartial.push(dataPart)
-        dataPart = []
-      }
+    let dataPart:typeof DataRaw.Select[] = []
+    for (let i = 0; i < 4; i++) {
+      dataPart = data.slice(i * dataLengthPerPart, (i + 1) * dataLengthPerPart)
+      dataPartial.push(dataPart)
     }
     dataPartial.push(dataPart)
     actions.setDataPartial(dataPartial)
+
+    console.log(dataPartial)
+
+    // store to local storage
+    localStorage.setItem('dataPartial', JSON.stringify(dataPartial))
   }),
 
   isLoading: false,
