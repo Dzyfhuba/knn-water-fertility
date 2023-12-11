@@ -12,7 +12,12 @@ import {
   TableNode
 } from '@table-library/react-table-library/table'
 import { useTheme } from '@table-library/react-table-library/theme'
+import {
+  useSort,
+  HeaderCellSort,
+} from '@table-library/react-table-library/sort'
 import styles from './datatable.module.css'
+import { MiddlewareFunction } from '@table-library/react-table-library/types/common'
 
 type Props = {
   tableData: Data<TableNode>
@@ -30,7 +35,7 @@ const DataTable = (props: Props) => {
         padding: 4px;
         background-color: transparent;
 
-        &:first-child {
+        &:first-of-type {
           font-weight: bold;
           // width: 25px !important;
         }
@@ -40,19 +45,44 @@ const DataTable = (props: Props) => {
       `,
   })
 
+  const onSortChange:MiddlewareFunction = (action, state) => {
+    // console.log(action, state)
+  }
+
+  const sort = useSort(props.tableData, {
+    onChange: onSortChange
+  },
+  {
+    sortFns: {
+      // @ts-ignore 
+      ID: (array) => array.sort((a,b) => a.id - b.id),
+      // @ts-ignore 
+      CHLOROPHYLL: (array) => array.sort((a,b) => a.chlo_a - b.chlo_a),
+      // @ts-ignore 
+      PHOSPHATE: (array) => array.sort((a,b) => a.fosfat - b.fosfat),
+      // @ts-ignore 
+      FERTILITY: (array) => array.sort((a,b) => a.kelas.localeCompare(b.kelas)),
+      // @ts-ignore 
+      CREATED_AT: (array) => array.sort((a,b) => a.created_at - b.created_at),
+      // @ts-ignore 
+      UPDATED_AT: (array) => array.sort((a,b) => a.updated_at - b.updated_at),
+    }
+  })
+
+
   return (
     <div className={styles.container}>
-      <Table data={props.tableData} theme={theme}>
+      <Table data={props.tableData} theme={theme} sort={sort}>
         {(tableList: typeof DataRaw.Select[]) => (
           <>
             <Header>
               <HeaderRow>
-                <HeaderCell resize>ID</HeaderCell>
-                <HeaderCell resize>Chlorophyll A</HeaderCell>
-                <HeaderCell resize>Phosphate</HeaderCell>
-                <HeaderCell resize>Fertility</HeaderCell>
-                <HeaderCell resize hide>Created At</HeaderCell>
-                <HeaderCell resize hide>Updated At</HeaderCell>
+                <HeaderCellSort sortKey='ID' resize>ID</HeaderCellSort>
+                <HeaderCellSort sortKey='CHLOROPHYLL' resize>Chlorophyll A</HeaderCellSort>
+                <HeaderCellSort sortKey='PHOSPHATE' resize>Phosphate</HeaderCellSort>
+                <HeaderCellSort sortKey='FERTILITY' resize>Fertility</HeaderCellSort>
+                <HeaderCellSort sortKey='CREATED_AT' resize hide>Created At</HeaderCellSort>
+                <HeaderCellSort sortKey='UPDATED_AT' resize hide>Updated At</HeaderCellSort>
               </HeaderRow>
             </Header>
             <Body>

@@ -52,6 +52,8 @@ const store = createStore<GlobalState>({
     for (let i = 0; i < dataLength; i++) {
       dataPart.push(data[i])
       if (i % dataLengthPerPart === 0 && i !== 0) {
+        // dataPart sort by id
+        dataPart.sort((a, b) => a.id - b.id)
         dataPartial.push(dataPart)
         dataPart = []
       }
