@@ -1,9 +1,9 @@
-import Image from 'next/image'
+import Data from '@/components/data'
 
 export default function HomePage() {
   return (
     <>
-      {process.env.NEXT_PUBLIC_APP_NAME}
+      <Data />
     </>
   )
 }
