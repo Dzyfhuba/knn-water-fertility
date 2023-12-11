@@ -9,3 +9,7 @@ table {
 .resizer-area:hover {
   @apply border-r-2 border-r-slate-700
 }
+
+th {
+  @apply text-base-content
+}

@@ -8,6 +8,9 @@ export interface GlobalState {
   data: typeof DataRaw.Select[]
   setData: Action<GlobalState, typeof DataRaw.Select[]>
   getData: Thunk<GlobalState>
+  dataPartial: typeof DataRaw.Select[][]
+  setDataPartial: Action<GlobalState, typeof DataRaw.Select[][]>
+  separateData: Thunk<GlobalState>
   isLoading: boolean
   setLoading: Action<GlobalState, boolean>
 }
@@ -30,7 +33,33 @@ const store = createStore<GlobalState>({
       })
     }
     actions.setLoading(false)
+    return data
   }),
+
+  dataPartial: [],
+  setDataPartial: action((state, payload) => {
+    state.dataPartial = payload
+  }),
+  separateData: thunk((actions) => {
+    // separate data into 4 parts
+    const data = store.getState().data
+    // shuffle data
+    data.sort(() => Math.random() - 0.5)
+    const dataPartial = []
+    const dataLength = data.length
+    const dataLengthPerPart = Math.floor(dataLength / 4)
+    let dataPart = []
+    for (let i = 0; i < dataLength; i++) {
+      dataPart.push(data[i])
+      if (i % dataLengthPerPart === 0 && i !== 0) {
+        dataPartial.push(dataPart)
+        dataPart = []
+      }
+    }
+    dataPartial.push(dataPart)
+    actions.setDataPartial(dataPartial)
+  }),
+
   isLoading: false,
   setLoading: action((state, payload) => {
     state.isLoading = payload
