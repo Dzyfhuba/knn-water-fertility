@@ -1,7 +1,7 @@
 import DataRaw from '@/types/data-raw'
 import supabase from '@/variables/supabase'
 import SweetAlertOption from '@/variables/sweetalert2'
-import kFoldCrossValidation from '@/variables/validation'
+import kFoldCrossValidation, { KFoldCrossValidationReturnType } from '@/variables/validation'
 import { Action, Thunk, action, createStore, thunk } from 'easy-peasy'
 import Swal from 'sweetalert2'
 
@@ -15,6 +15,8 @@ export interface GlobalState {
   separateData: Thunk<GlobalState>
   isLoading: boolean
   setLoading: Action<GlobalState, boolean>
+  kFoldCrossValidation: KFoldCrossValidationReturnType
+  setKFoldCrossValidation: Action<GlobalState, KFoldCrossValidationReturnType>
 }
 
 const store = createStore<GlobalState>({
@@ -43,13 +45,20 @@ const store = createStore<GlobalState>({
     state.dataPartial = payload
   }),
   separateData: thunk((actions) => {
-    const dataPartial = kFoldCrossValidation(store.getState().data)
-    actions.setDataPartial(dataPartial)
+    const result = kFoldCrossValidation(store.getState().data)
+    actions.setDataPartial(result.dataParts)
 
-    console.log(dataPartial)
+    console.log(result)
+
+    actions.setKFoldCrossValidation(result)
 
     // store to local storage
-    localStorage.setItem('dataPartial', JSON.stringify(dataPartial))
+    localStorage.setItem('dataPartial', JSON.stringify(result.dataParts))
+  }),
+
+  kFoldCrossValidation: {dataParts: [], modelScore: 0},
+  setKFoldCrossValidation: action((state, payload) => {
+    state.kFoldCrossValidation = payload
   }),
 
   isLoading: false,

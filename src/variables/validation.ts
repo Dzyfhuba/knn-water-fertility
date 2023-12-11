@@ -1,10 +1,12 @@
 import DataRaw from '@/types/data-raw'
 
+export type KFoldCrossValidationReturnType = {
+  dataParts: DataRaw.Select[][]
+  modelScore?: number
+}
+
 interface KFoldCrossValidation {
-  (data: DataRaw.Select[], k?: number): {
-    dataParts: DataRaw.Select[][]
-    modelScore?: number
-  }
+  (data: DataRaw.Select[], k?: number): KFoldCrossValidationReturnType
 }
 
 // K-Fold Cross Validation for 4 parts

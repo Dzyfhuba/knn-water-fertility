@@ -2,32 +2,16 @@
 
 import globalStyles from '@/app/global.module.css'
 import { useStoreActions, useStoreState } from '@/state/hooks'
-import DataRaw from '@/types/data-raw'
-import { Data as Train } from '@/types/table'
-import Time from '@/variables/time'
-import {
-  Body,
-  Cell,
-  Header,
-  HeaderCell,
-  HeaderRow,
-  Row,
-  Table,
-  TableNode
-} from '@table-library/react-table-library/table'
 import { useTheme } from '@table-library/react-table-library/theme'
 import { useEffect } from 'react'
-import styles from './train.module.css'
-import Loading from './loading'
 import DataTable from './datatable'
+import Loading from './loading'
+import styles from './train.module.css'
 
 const Train = () => {
   const { getData, separateData } = useStoreActions((actions) => actions)
-  const { data, dataPartial } = useStoreState((state) => state)
+  const { data, dataPartial, kFoldCrossValidation } = useStoreState((state) => state)
 
-  const tableData: Train<TableNode> = {
-    nodes: data
-  }
 
   useEffect(() => {
     getData().then(() => {
@@ -48,6 +32,7 @@ const Train = () => {
       `,
   })
 
+
   return (
     <>
       <h1 className={globalStyles.title}>Data</h1>
@@ -57,6 +42,13 @@ const Train = () => {
             <button onClick={() => separateData()} autoFocus className={styles.shuffleButton}>
             Shuffle and Split Data
             </button>
+            <div className="hidden">
+              {
+                kFoldCrossValidation.modelScore ? (
+                  <p>K Fold Cross Validation Score: {kFoldCrossValidation.modelScore}</p>
+                ) : <></>
+              }
+            </div>
             <p>Membagi data menggunakan K-Fold Cross Validation menjadi 4 bagian seperti berikut:</p>
           </>
         ) : (

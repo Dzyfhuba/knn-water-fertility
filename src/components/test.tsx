@@ -7,6 +7,7 @@ import DataTable from './datatable'
 import DataRaw from '@/types/data-raw'
 import Swal from 'sweetalert2'
 import SweetalertParams from '@/variables/sweetalert2'
+import kFoldCrossValidation from '@/variables/validation'
 
 
 const Test = () => {
@@ -31,14 +32,6 @@ const Test = () => {
     try {
       const dataPartial = JSON.parse(localStorage.getItem('dataPartial') as string) as DataRaw.Select[][] || dataPartialState
       if (dataPartial.length) {
-        // const indexTrain = Math.floor(Math.random() * dataPartial.length)
-        // const dataTrain = dataPartial[indexTrain]
-        // const indexTest = Math.floor(Math.random() * (dataPartial.length-1))
-        // const dataTest = dataPartial.filter(item => item !== dataTrain)[indexTest]
-
-        // dataTrain is 3 elements of dataPartial
-        // dataTest is 1 element of dataPartial after dataTrain is removed
-        // get random index all different from each other for dataTrain
         const temp = [...dataPartial]
         // generate random index for dataTrain without duplicate
         let indexTrain: number[] = []
