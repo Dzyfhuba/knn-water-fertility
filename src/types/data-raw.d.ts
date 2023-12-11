@@ -1,11 +1,12 @@
-const DataRaw = {
-  Select = {
-    chlo_a: number,
-    created_at: string,
-    fosfat: number,
+namespace DataRaw {
+  interface Select {
     id: number,
+    chlo_a: number,
+    fosfat: number,
     kelas: string,
+    kelasPredict?: string,
     updated_at: string,
+    created_at: string,
   }
 }
 

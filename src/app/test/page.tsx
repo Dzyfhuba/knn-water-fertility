@@ -1,7 +1,16 @@
-const TestPage = () => {
+import Client from '@/components/client'
+import Test from '@/components/test'
+
+const PredictsPage = () => {
+  
+  
   return (
-    <div>Test</div>
+    <div>
+      <Client>
+        <Test />
+      </Client>
+    </div>
   )
 }
 
-export default TestPage
+export default PredictsPage

@@ -1,5 +1,15 @@
 type Feature = number[]
-type Label = 'Eutrofik' | 'Oligotrofik' | 'Mesotrofik'
+export type Label = 'Eutrofik' | 'Oligotrofik' | 'Mesotrofik'
+export type ConfusionMatrix = {
+  TP?: number
+  TN?: number
+  FP?: number
+  FN?: number
+  accuracy?: number
+  precision?: number
+  recall?: number
+  f1Score?: number
+}
 
 class KNN {
   private k: number
@@ -72,6 +82,65 @@ class KNN {
     })
 
     return predictions
+  }
+
+  // calculate accuracy using confusion matrix
+  public confusionMatrix(predictions: Label[], labels: Label[]):ConfusionMatrix  {
+    if (predictions.length !== labels.length) {
+      throw new Error('predictions and labels must have the same length')
+    }
+
+    // true positive
+    const tp = predictions.reduce((acc, prediction, index) => {
+      if (prediction === labels[index]) {
+        acc += 1
+      }
+
+      return acc
+    }, 0)
+
+    // true negative
+    const tn = predictions.reduce((acc, prediction, index) => {
+      if (prediction !== labels[index]) {
+        acc += 1
+      }
+
+      return acc
+    }, 0)
+
+    // false positive
+    const fp = predictions.reduce((acc, prediction, index) => {
+      if (prediction !== labels[index]) {
+        acc += 1
+      }
+
+      return acc
+    }, 0)
+
+    // false negative
+    const fn = predictions.reduce((acc, prediction, index) => {
+      if (prediction !== labels[index]) {
+        acc += 1
+      }
+
+      return acc
+    }, 0)
+
+    const accuracy = (tp + tn) / (tp + tn + fp + fn)
+    const precision = tp / (tp + fp)
+    const recall = tp / (tp + fn)
+    const f1Score = 2 * (precision * recall) / (precision + recall)
+
+    return {
+      accuracy,
+      precision,
+      recall,
+      f1Score,
+      TP: tp,
+      TN: tn,
+      FP: fp,
+      FN: fn,
+    }
   }
 }
 

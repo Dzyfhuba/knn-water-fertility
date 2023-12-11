@@ -20,7 +20,7 @@ import styles from './datatable.module.css'
 import { MiddlewareFunction } from '@table-library/react-table-library/types/common'
 
 type Props = {
-  tableData: Data<TableNode>
+  tableData: Data<TableNode & DataRaw.Select>
 }
 
 const DataTable = (props: Props) => {
@@ -45,7 +45,7 @@ const DataTable = (props: Props) => {
       `,
   })
 
-  const onSortChange:MiddlewareFunction = (action, state) => {
+  const onSortChange: MiddlewareFunction = (action, state) => {
     // console.log(action, state)
   }
 
@@ -55,17 +55,19 @@ const DataTable = (props: Props) => {
   {
     sortFns: {
       // @ts-ignore 
-      ID: (array) => array.sort((a,b) => a.id - b.id),
+      ID: (array) => array.sort((a, b) => a.id - b.id),
       // @ts-ignore 
-      CHLOROPHYLL: (array) => array.sort((a,b) => a.chlo_a - b.chlo_a),
+      CHLOROPHYLL: (array) => array.sort((a, b) => a.chlo_a - b.chlo_a),
       // @ts-ignore 
-      PHOSPHATE: (array) => array.sort((a,b) => a.fosfat - b.fosfat),
+      PHOSPHATE: (array) => array.sort((a, b) => a.fosfat - b.fosfat),
       // @ts-ignore 
-      FERTILITY: (array) => array.sort((a,b) => a.kelas.localeCompare(b.kelas)),
+      FERTILITY: (array) => array.sort((a, b) => a.kelas.localeCompare(b.kelas)),
       // @ts-ignore 
-      CREATED_AT: (array) => array.sort((a,b) => a.created_at - b.created_at),
+      FERTILITY_PREDICT: (array) => array.sort((a, b) => a.kelasPerdict.localeCompare(b.kelasPerdict)),
       // @ts-ignore 
-      UPDATED_AT: (array) => array.sort((a,b) => a.updated_at - b.updated_at),
+      CREATED_AT: (array) => array.sort((a, b) => a.created_at - b.created_at),
+      // @ts-ignore 
+      UPDATED_AT: (array) => array.sort((a, b) => a.updated_at - b.updated_at),
     }
   })
 
@@ -73,7 +75,7 @@ const DataTable = (props: Props) => {
   return (
     <div className={styles.container}>
       <Table data={props.tableData} theme={theme} sort={sort}>
-        {(tableList: typeof DataRaw.Select[]) => (
+        {(tableList: DataRaw.Select[]) => (
           <>
             <Header>
               <HeaderRow>
@@ -81,6 +83,13 @@ const DataTable = (props: Props) => {
                 <HeaderCellSort sortKey='CHLOROPHYLL' resize>Chlorophyll A</HeaderCellSort>
                 <HeaderCellSort sortKey='PHOSPHATE' resize>Phosphate</HeaderCellSort>
                 <HeaderCellSort sortKey='FERTILITY' resize>Fertility</HeaderCellSort>
+                {
+                  // tableList has kelasPredict
+                  tableList[0]?.kelasPredict !== undefined
+                    ? (
+                      <HeaderCellSort sortKey='FERTILITY_PREDICT' resize>Fertility Predict</HeaderCellSort>
+                    ) : <></>
+                }
                 <HeaderCellSort sortKey='CREATED_AT' resize hide>Created At</HeaderCellSort>
                 <HeaderCellSort sortKey='UPDATED_AT' resize hide>Updated At</HeaderCellSort>
               </HeaderRow>
@@ -92,6 +101,12 @@ const DataTable = (props: Props) => {
                   <Cell>{item.chlo_a}</Cell>
                   <Cell>{item.fosfat}</Cell>
                   <Cell>{item.kelas}</Cell>
+                  {
+                    // has kelasPredict
+                    item.kelasPredict ? (
+                      <Cell>{item.kelasPredict}</Cell>
+                    ) : <></>
+                  }
                   <Cell hide>{Time.format(item.created_at)}</Cell>
                   <Cell hide>{Time.format(item.updated_at)}</Cell>
                 </Row>
