@@ -2,3 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+table {
+  @apply !rounded-none
+}
+
+.resizer-area:hover {
+  @apply border-r-2 border-r-slate-700
+}

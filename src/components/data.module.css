@@ -1,0 +1,7 @@
+.container {
+  @apply overflow-x-scroll
+}
+
+.title {
+  @apply text-xl font-bold underline
+}

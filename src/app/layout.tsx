@@ -1,8 +1,11 @@
+import Navbar from '@/components/navbar'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
-import Navbar from '@/components/navbar'
 import styles from './layout.module.css'
+import moment from 'moment'
+import 'moment/locale/id'
+moment.locale('id')
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -19,10 +22,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
+        
         <Navbar />
         <main className={styles.main}>
           {children}
         </main>
+        
       </body>
     </html>
   )
