@@ -9,3 +9,15 @@
 .confusionMatrix > * {
   @apply border border-gray-400 p-3
 }
+
+.kForm {
+  @apply block
+}
+
+.inputK {
+  @apply input w-full input-bordered max-w-sm
+}
+
+.btnSubmit {
+  @apply btn btn-success
+}

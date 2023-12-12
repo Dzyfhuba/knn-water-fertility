@@ -25,7 +25,7 @@ const Data = () => {
   const { getData } = useStoreActions((actions) => actions)
   const { data } = useStoreState((state) => state)
 
-  const tableData: Data<TableNode> = {
+  const tableData: Data<TableNode & DataRaw.Select> = {
     nodes: data
   }
 

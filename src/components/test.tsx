@@ -18,6 +18,7 @@ const Test = () => {
   const [indexTrain, setIndexTrain] = useState<number[]>([])
   const [indexTest, setIndexTest] = useState<number>(0)
   const [dataTrain, setDataTrain] = useState<DataRaw.Select[]>([])
+  const [k, setK] = useState(1)
 
   useEffect(() => {
     const dataTestXYPredict = localStorage.getItem('dataTestXYPredict')
@@ -84,7 +85,7 @@ const Test = () => {
         })
 
         // KNN
-        const model = new KNN(1)
+        const model = new KNN(k)
         model.train(dataTrainX, dataTrainY)
 
         const predictions = model.predict(dataTestX)
@@ -151,12 +152,28 @@ const Test = () => {
     <div>
       <h1 className={globalStyles.title}>Test</h1>
 
-      <button
-        onClick={handlePredict}
-        className={styles.testButton}
-      >
+      <form className={styles.kForm+' join'} onSubmit={(e) => {
+        e.preventDefault()
+        handlePredict()
+      }}>
+        <input 
+          type="number" 
+          className={styles.inputK + ' join-item'} 
+          placeholder='Insert K here... (Default: K=1)' 
+          onChange={(e) => {
+            setK(Number(e.target.value))
+          }}
+        />
+        <small>{}</small>
+        <button
+          type='submit'
+          className={styles.testButton + ' join-item'}
+          disabled={!!!(k%2)}
+        >
         Predict With Test Data
-      </button>
+        </button>
+      </form>
+
 
       <p>Tabel {indexTrain.map(i => i+1).join('-')} sebagai train.</p>
       <p>Tabel {indexTest+1} sebagai test.</p>

@@ -26,6 +26,10 @@ class KNN {
   private labels?: Label[]
 
   constructor(k: number) {
+    // k is must odd
+    if (k % 2 === 0) {
+      throw new Error('k must be odd')
+    }
     this.k = k
   }
 
