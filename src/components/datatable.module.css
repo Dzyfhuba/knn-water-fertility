@@ -23,5 +23,5 @@
 }
 
 .downloadButton {
-  @apply btn btn-outline block ml-auto
+  @apply btn btn-outline block ml-auto btn-xs
 }

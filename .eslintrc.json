@@ -3,6 +3,7 @@
   "rules": {
     "semi": ["error", "never"],
     "quotes": ["error", "single"],
-    "indent": ["error", 2]
+    "indent": ["error", 2],
+    "object-curly-spacing": ["error", "always"]
   }
 }

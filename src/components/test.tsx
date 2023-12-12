@@ -42,7 +42,7 @@ const Test = () => {
         let indexTrain: number[] = []
         let indexTest: number = 0
         do {
-          indexTrain = Array.from({length: 3}, () => Math.floor(Math.random() * temp.length))
+          indexTrain = Array.from({ length: 3 }, () => Math.floor(Math.random() * temp.length))
           indexTest = Math.floor(Math.random() * temp.length)
         } while (indexTrain[0] === indexTrain[1] || indexTrain[0] === indexTrain[2] || indexTrain[1] === indexTrain[2] || indexTrain.includes(indexTest))
         console.log(indexTrain, indexTest)
@@ -57,11 +57,11 @@ const Test = () => {
         setDataTrain(dataTrain)
 
 
-        console.log({dataTrain})
-        console.log({dataTest})
+        console.log({ dataTrain })
+        console.log({ dataTest })
 
-        console.log({indexTrain})
-        console.log({indexTest})
+        console.log({ indexTrain })
+        console.log({ indexTest })
 
         setIndexTrain(indexTrain)
         setIndexTest(dataPartial.findIndex(item => item === dataTest))
@@ -91,7 +91,7 @@ const Test = () => {
 
         const predictions = model.predict(dataTestX)
 
-        console.log({predictions})
+        console.log({ predictions })
       
         // merge dataTestX, dataTestY back to {chlo_a, fosfat, kelas}
         const dataTestXY = dataTestX.map((item, index) => {
@@ -117,7 +117,7 @@ const Test = () => {
           }
         })
 
-        console.log({dataTestXYPredict})
+        console.log({ dataTestXYPredict })
 
         // calculate confusion matrix
         const confustionMatrix = model.confusionMatrix(dataTestY, predictions.predictions.map(item => item.label))
@@ -165,7 +165,6 @@ const Test = () => {
             setK(Number(e.target.value))
           }}
         />
-        <small>{}</small>
         <button
           type='submit'
           className={styles.testButton + ' join-item'}
@@ -193,11 +192,11 @@ const Test = () => {
       
       <h2>Hasil Prediksi Data Test</h2>
       <p>Length: {calculatedData.length}</p>
-      <DataTable tableData={{nodes: calculatedData as TableNode[]}} />
+      <DataTable tableData={{ nodes: calculatedData as TableNode[] }} />
 
       <h2>Train Data</h2>
       <p>Length: {dataTrain.length}</p>
-      <DataTable tableData={{nodes: dataTrain as TableNode[]}} />
+      <DataTable tableData={{ nodes: dataTrain as TableNode[] }} />
     </div>
   )
 }

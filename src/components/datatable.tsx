@@ -84,7 +84,7 @@ const DataTable = (props: Props) => {
   return (
     <div className={styles.container}>
       <button 
-        className={styles.downloadButton}
+        className={styles.downloadButton + (props.downloadable ? '' : ' !hidden')}
         onClick={() => {
           // exclude distances
           const data = props.tableData.nodes.map(item => {
@@ -94,7 +94,7 @@ const DataTable = (props: Props) => {
           downloadAsCSV(data, 'data.csv')
         }}
       >
-        <MdDownload size={24} />
+        <MdDownload size={14} />
       </button>
       <Table data={props.tableData} theme={theme} sort={sort}>
         {(tableList: DataRaw.Select[]) => (

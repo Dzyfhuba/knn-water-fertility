@@ -7,6 +7,8 @@ import styles from './predict.module.css'
 import { MdDelete } from 'react-icons/md'
 import DataTable from './datatable'
 import { TableNode } from '@table-library/react-table-library/types/table'
+import { useStoreActions, useStoreState } from '@/state/hooks'
+import KNN, { ConfusionMatrix, Label } from '@/variables/knn'
 
 const InputContainer = (props: {
   index: number
@@ -52,12 +54,18 @@ const InputContainer = (props: {
 const Predict = () => {
   const [predictData, setPredictData] = useState<DataRaw.Select[]>([])
   const [length, setLength] = useState(1)
+  const { data } = useStoreState(state => state)
+  const { getData } = useStoreActions(actions => actions)
+  const [k, setK] = useState(1)
+  const [confustionMatrix, setConfustionMatrix] = useState<ConfusionMatrix>({})
 
   useEffect(() => {
     const data = localStorage.getItem('predictData')
     if (data) {
       setPredictData(JSON.parse(data))
     }
+
+    getData()
   }, [])
 
   const handleFormAddPredict = (e:SyntheticEvent) => {
@@ -81,10 +89,31 @@ const Predict = () => {
       id: i+1,
       chlo_a: chloA,
       fosfat: fosfat[i],
+      distance: undefined,
+      kelasPredict: undefined
     }))
     
     setPredictData(data)
     localStorage.setItem('predictData', JSON.stringify(data))
+  }
+
+  const handleProcessPredict = () => {
+    const model = new KNN(k)
+
+    const dataTrainX = data.map(item => [item.chlo_a, item.fosfat])
+    const dataTrainY = data.map(item => item.kelas as Label)
+
+    const dataPredictX = predictData.map(item => [item.chlo_a, item.fosfat])
+
+    model.train(dataTrainX, dataTrainY)
+    const predictions = model.predict(dataPredictX)
+
+    setPredictData(predictData.map((item, index) => ({
+      ...item,
+      kelasPredict: predictions.predictions[index].label,
+      distance: predictions.predictions[index].distance,
+      distances: predictions.predictions[index].distances,
+    })))
   }
 
   return (
@@ -97,7 +126,7 @@ const Predict = () => {
             <summary>Isi data untuk prediksi</summary>
             <form className={styles.form} onSubmit={handleFormAddPredict}>
               {
-                Array.from({length}).map((_, i) => (<InputContainer key={i} index={i+1} />))
+                Array.from({ length }).map((_, i) => (<InputContainer key={i} index={i+1} />))
               }
               <button
                 type='button'
@@ -120,9 +149,33 @@ const Predict = () => {
         </li>
       </ul>
 
+      <form className={styles.kForm+' join'} onSubmit={(e) => {
+        e.preventDefault()
+        handleProcessPredict()
+      }}>
+        <input 
+          type="number" 
+          className={styles.inputK + ' join-item'} 
+          placeholder='Insert K here... (Default: K=1)' 
+          onChange={(e) => {
+            setK(Number(e.target.value))
+          }}
+        />
+        <button
+          className={styles.btnProcess + ' join-item'}
+          type='submit'
+          disabled={!!!(k%2)}
+        >
+        Process Predict
+        </button>
+      </form>
+
       {/* Data Predict */}
-      <DataTable tableData={{nodes: predictData as TableNode[]}} />
+      <h2 className={styles.subTitle}>Predict Data</h2>
+      <DataTable tableData={{ nodes: predictData as TableNode[] }} />
       
+      <h2 className={styles.subTitle}>Train Data</h2>
+      <DataTable tableData={{ nodes: data as TableNode[] }} />
     </div>
   )
 }
