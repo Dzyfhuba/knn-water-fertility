@@ -25,10 +25,6 @@ const Data = () => {
   const { getData } = useStoreActions((actions) => actions)
   const { data } = useStoreState((state) => state)
 
-  const tableData: Data<TableNode & DataRaw.Select> = {
-    nodes: data
-  }
-
   useEffect(() => {
     getData()
   }, [getData])
@@ -53,7 +49,7 @@ const Data = () => {
 
       {
         data.length ? (
-          <DataTable tableData={tableData} />
+          <DataTable tableData={{nodes: data as TableNode[]}} />
         ) : (
           <div className={styles.loadingContainer}>
             <Loading size='lg' />
