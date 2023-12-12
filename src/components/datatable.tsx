@@ -36,13 +36,16 @@ type Props = {
   length?: number
   downloadable?: boolean
   onSelect?: MiddlewareFunction
+  enableSelect?: boolean
 }
 
 const DataTable = (props: Props) => {
+  const finalLength = ((props.length || 4) - (props.enableSelect ? 0 : 1))
+  console.log({ finalLength })
 
   const theme = useTheme({
     Table: `
-        --data-table-library_grid-template-columns: 30px repeat(${props.length || 4}, minmax(0px, 1fr)) !important;
+        --data-table-library_grid-template-columns: 50px repeat(${finalLength}, minmax(0px, 1fr)) !important;
         min-width: 600px;
       `,
     BaseCell: `
@@ -121,7 +124,9 @@ const DataTable = (props: Props) => {
           <>
             <Header>
               <HeaderRow>
-                <HeaderCellSelect />
+                {
+                  props.enableSelect ? (<HeaderCellSelect />) : <></>
+                }
                 <HeaderCellSort sortKey='ID'>ID</HeaderCellSort>
                 <HeaderCellSort sortKey='CHLOROPHYLL'>Chlorophyll A</HeaderCellSort>
                 <HeaderCellSort sortKey='PHOSPHATE'>Phosphate</HeaderCellSort>
@@ -229,7 +234,9 @@ const DataTable = (props: Props) => {
                   }}
                   className='hover:cursor-pointer'
                 >
-                  <CellSelect item={item as TableNode} />
+                  {
+                    props.enableSelect ? <CellSelect item={item as TableNode} /> : <></>
+                  }
                   <Cell pinLeft>{item.id}</Cell>
                   <Cell>{item.chlo_a}</Cell>
                   <Cell>{item.fosfat}</Cell>

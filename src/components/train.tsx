@@ -8,6 +8,7 @@ import DataTable from './datatable'
 import Loading from './loading'
 import styles from './train.module.css'
 import { TableNode } from '@table-library/react-table-library/types/table'
+import getVisibleLength from '@/variables/visibleLength'
 
 const Train = () => {
   const { getData, separateData } = useStoreActions((actions) => actions)
@@ -33,6 +34,7 @@ const Train = () => {
       `,
   })
 
+  const dataPartialByPartLength = getVisibleLength(dataPartial.length ? dataPartial[0] : [])
 
   return (
     <>
@@ -76,7 +78,7 @@ const Train = () => {
           data.length ? (dataPartial.length ? dataPartial.map((data, idx) => (
             <div key={idx}>
               <h2 className={styles.subTitle}>table {idx + 1} (length: {data.length})</h2>
-              <DataTable tableData={{ nodes: data as TableNode[] }} />
+              <DataTable tableData={{ nodes: data as TableNode[] }} length={dataPartialByPartLength} />
             </div>
           )) : (
             !data.length ? (

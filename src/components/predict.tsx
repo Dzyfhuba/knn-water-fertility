@@ -89,9 +89,6 @@ const Predict = () => {
       id: i+1,
       chlo_a: chloA,
       fosfat: fosfat[i],
-      distance: undefined,
-      kelasPredict: undefined,
-      kelas: undefined
     }))
     
     setPredictData(data)

@@ -6,6 +6,7 @@ import DataRaw from '@/types/data-raw'
 import { MiddlewareFunction } from '@table-library/react-table-library/types/common'
 import { TableNode } from '@table-library/react-table-library/types/table'
 import { SyntheticEvent, useEffect, useState } from 'react'
+import { MdDownload, MdUpload } from 'react-icons/md'
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import styles from './data.module.css'
@@ -30,7 +31,7 @@ const Form = (props: {
       kelas: formData.kelas || ''
     })
   }
-  
+
   return (
     <form className={styles.formContainer} onSubmit={handleSubmit}>
       <div>
@@ -83,6 +84,21 @@ const Form = (props: {
     </form>
   )
 }
+const FormUpload = (props: {
+  className?: string
+}) => {
+  return (
+    <div>
+      <span className='text-error font-black'>XLSX Only</span>
+      
+      <button
+        className={styles.btnSubmit}
+      >
+        Upload
+      </button>
+    </div>
+  )
+}
 
 const Data = () => {
   const { getData, updateData, deleteData, storeData } = useStoreActions((actions) => actions)
@@ -96,15 +112,15 @@ const Data = () => {
   }, [getData])
 
   const handleSelect = (
-    action:{
-      payload:{
+    action: {
+      payload: {
         ids: number[]
         options: {
           isCarryForward: boolean
           isPartialToAll: boolean
         }
       }
-    }, 
+    },
     state: {
       id: null
       ids: number[]
@@ -115,7 +131,7 @@ const Data = () => {
   }
 
   const handleEdit = () => {
-    console.log(data[ids[0]-1])
+    console.log(data[ids[0] - 1])
     ReactSwal.fire({
       title: 'Edit Data',
       html: <Form defaultValue={data[ids[0]]} onSubmit={async (formValue) => {
@@ -154,6 +170,15 @@ const Data = () => {
     })
   }
 
+  const handleUpload = () => {
+    ReactSwal.fire({
+      title: 'Upload Data',
+      html: <FormUpload />,
+      showConfirmButton: false,
+      showCloseButton: true,
+    })
+  }
+
   return (
     <>
       <h1 className={globalStyles.title}>Data</h1>
@@ -162,31 +187,72 @@ const Data = () => {
         <div>
           <button
             type="button"
-            className={styles.btnEdit + (ids.length === 1 ? '': ' !hidden')}
+            className={styles.btnEdit + (ids.length === 1 ? '' : ' !hidden')}
             onClick={handleEdit}
           >
-          Edit
+            Edit
           </button>
           <button
             type="button"
-            className={styles.btnDelete + (ids.length ? '': ' !hidden')}
+            className={styles.btnDelete + (ids.length ? '' : ' !hidden')}
             onClick={handleDelete}
           >
-          Delete
+            Delete
           </button>
         </div>
-        <button
-          type="button"
-          className={styles.btnCreate}
-          onClick={handleCreate}
-        >
-          Create
-        </button>
+        <div>
+          <button
+            className={styles.btnDownload}
+            onClick={() => {
+              // small swal
+              ReactSwal.fire({
+                title: 'Format Data',
+                text: 'Apakah anda ingin mendownload format data?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Ya',
+                cancelButtonText: 'Tidak',
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                width: '30rem',
+                reverseButtons: true,
+                toast: true,
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  const link = document.createElement('a')
+                  link.href = '/format.xlsx'
+                  link.download = 'format.xlsx'
+                  link.click()
+                }
+              })
+            }}
+          >
+            <MdDownload size={24} /> Format  
+          </button>
+          <button
+            type="button"
+            className={styles.btnUpload}
+            onClick={handleUpload}
+          >
+            <MdUpload size={24} />
+          </button>
+          <button
+            type="button"
+            className={styles.btnCreate}
+            onClick={handleCreate}
+          >
+            Create
+          </button>
+        </div>
       </div>
 
       {
         data.length ? (
-          <DataTable tableData={{ nodes: data as TableNode[] }} onSelect={handleSelect as unknown as MiddlewareFunction} />
+          <DataTable 
+            tableData={{ nodes: data as TableNode[] }} 
+            onSelect={handleSelect as unknown as MiddlewareFunction}
+            enableSelect
+          />
         ) : (
           <div className={styles.loadingContainer}>
             <Loading size='lg' />

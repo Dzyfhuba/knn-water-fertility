@@ -46,7 +46,14 @@
   @apply btn btn-success
 }
 
-
 .formSelect {
   @apply select select-bordered w-full
+}
+
+.btnUpload {
+  @apply btn btn-secondary 
+}
+
+.btnDownload {
+  @apply btn btn-accent
 }

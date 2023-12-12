@@ -194,7 +194,10 @@ const Test = () => {
       
       <h2>Hasil Prediksi Data Test</h2>
       <p>Length: {calculatedData.length}</p>
-      <DataTable tableData={{ nodes: calculatedData as TableNode[] }} length={calculatedDataLength > 0 ? calculatedDataLength : 6} />
+      <DataTable 
+        tableData={{ nodes: calculatedData as TableNode[] }} 
+        length={calculatedDataLength} 
+      />
 
       <h2>Train Data</h2>
       <p>Length: {dataTrain.length}</p>
