@@ -25,7 +25,7 @@ import { MdDownload } from 'react-icons/md'
 import downloadAsCSV from '@/variables/download'
 
 type Props = {
-  tableData: Data<TableNode & DataRaw.Select>
+  tableData: Data<TableNode>
   downloadable?: boolean
 }
 
@@ -104,7 +104,13 @@ const DataTable = (props: Props) => {
                 <HeaderCellSort sortKey='ID' resize>ID</HeaderCellSort>
                 <HeaderCellSort sortKey='CHLOROPHYLL' resize>Chlorophyll A</HeaderCellSort>
                 <HeaderCellSort sortKey='PHOSPHATE' resize>Phosphate</HeaderCellSort>
-                <HeaderCellSort sortKey='FERTILITY' resize>Fertility</HeaderCellSort>
+                {
+                  // tableList has kelas
+                  tableList[0]?.kelas !== undefined
+                    ? (
+                      <HeaderCellSort sortKey='FERTILITY' resize>Fertility</HeaderCellSort>
+                    ) : <></>
+                }
                 {
                   // tableList has kelasPredict
                   tableList[0]?.kelasPredict !== undefined
@@ -124,10 +130,10 @@ const DataTable = (props: Props) => {
               </HeaderRow>
             </Header>
             <Body>
-              {tableList.map(item => (
+              {tableList.map((item) => (
                 <Row
                   key={item.id}
-                  item={item}
+                  item={item as TableNode}
                   onClick={() => {
                     ReactSwal.fire({
                       title: 'Data',
@@ -154,8 +160,8 @@ const DataTable = (props: Props) => {
                                 </>
                               ) : <></>
                             }
-                            <span>Dibuat:</span> <span>{Time.format(item.created_at)}</span>
-                            <span>Diubah:</span> <span>{Time.format(item.updated_at)}</span>
+                            <span>Dibuat:</span> <time>{Time.format(item.created_at)}</time>
+                            <span>Diubah:</span> <time>{Time.format(item.updated_at)}</time>
                           </div>
                           <table className={styles.sweetAlertTable}>
                             <thead>
@@ -187,7 +193,12 @@ const DataTable = (props: Props) => {
                   <Cell pinLeft>{item.id}</Cell>
                   <Cell>{item.chlo_a}</Cell>
                   <Cell>{item.fosfat}</Cell>
-                  <Cell>{item.kelas}</Cell>
+                  {
+                    // has kelas
+                    item.kelas ? (
+                      <Cell>{item.kelas}</Cell>
+                    ) : <></>
+                  }
                   {
                     // has kelasPredict
                     item.kelasPredict ? (

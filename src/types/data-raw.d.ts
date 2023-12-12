@@ -2,15 +2,15 @@ import { Label } from '@/variables/knn'
 
 namespace DataRaw {
   interface Select {
-    id: number,
+    id?: number,
     chlo_a: number,
     fosfat: number,
-    kelas: string,
+    kelas?: string,
     kelasPredict?: string,
     distance?: number,
     distances?: {label: Label, distance: number}[],
-    updated_at: string,
-    created_at: string,
+    updated_at?: string,
+    created_at?: string,
   }
 }
 

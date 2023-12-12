@@ -9,6 +9,7 @@ import DataRaw from '@/types/data-raw'
 import Swal from 'sweetalert2'
 import SweetalertParams from '@/variables/sweetalert2'
 import kFoldCrossValidation from '@/variables/validation'
+import { TableNode } from '@table-library/react-table-library/types/table'
 
 
 const Test = () => {
@@ -51,7 +52,7 @@ const Test = () => {
         const dataTest = temp[indexTest]
 
         // sort dataTrain
-        dataTrain = dataTrain.sort((a, b) => a.id - b.id)
+        dataTrain = dataTrain.sort((a, b) => a.id! - b.id!)
 
         setDataTrain(dataTrain)
 
@@ -124,7 +125,7 @@ const Test = () => {
         // console.log({confustionMatrix})
 
         // sort dataTestXYPredict
-        dataTestXYPredict.sort((a, b) => a.id - b.id)
+        dataTestXYPredict.sort((a, b) => a.id! - b.id!)
 
         setCalculatedData(dataTestXYPredict)
         setConfustionMatrix(confustionMatrix)
@@ -192,11 +193,11 @@ const Test = () => {
       
       <h2>Hasil Prediksi Data Test</h2>
       <p>Length: {calculatedData.length}</p>
-      <DataTable tableData={{nodes: calculatedData}} />
+      <DataTable tableData={{nodes: calculatedData as TableNode[]}} />
 
       <h2>Train Data</h2>
       <p>Length: {dataTrain.length}</p>
-      <DataTable tableData={{nodes: dataTrain}} />
+      <DataTable tableData={{nodes: dataTrain as TableNode[]}} />
     </div>
   )
 }
