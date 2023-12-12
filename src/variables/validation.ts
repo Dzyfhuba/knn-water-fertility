@@ -18,7 +18,7 @@ const kFoldCrossValidation:KFoldCrossValidation = (data, k = 4) => {
   const dataLengthPerPart = Math.floor(dataLength / k)
   const dataParts:DataRaw.Select[][] = []
   for (let i = 0; i < k; i++) {
-    dataParts.push(data.slice(i * dataLengthPerPart, (i + 1) * dataLengthPerPart).sort((a, b) => a.id - b.id))
+    dataParts.push(data.slice(i * dataLengthPerPart, (i + 1) * dataLengthPerPart).sort((a, b) => a.id! - b.id!))
   }
   
   // get model score using linear regression
@@ -40,10 +40,10 @@ const linearRegressionScore = (dataTrain: DataRaw.Select[], dataTest: DataRaw.Se
   // calculate mean y of kelas, kelas is 'Eutrofik', 'Oligotrofik', 'Mesotrofik'
   // so we need to convert it to number
   const kelas = ['Eutrofik', 'Oligotrofik', 'Mesotrofik']
-  const meanY = dataTrain.reduce((acc, cur) => acc + kelas.indexOf(cur.kelas), 0) / dataTrain.length
+  const meanY = dataTrain.reduce((acc, cur) => acc + kelas.indexOf(cur.kelas!), 0) / dataTrain.length
 
   // calculate m
-  const m = dataTrain.reduce((acc, cur) => acc + (cur.chlo_a + cur.fosfat - meanX) * (kelas.indexOf(cur.kelas) - meanY), 0) / dataTrain.reduce((acc, cur) => acc + Math.pow(cur.chlo_a + cur.fosfat - meanX, 2), 0)
+  const m = dataTrain.reduce((acc, cur) => acc + (cur.chlo_a + cur.fosfat - meanX) * (kelas.indexOf(cur.kelas!) - meanY), 0) / dataTrain.reduce((acc, cur) => acc + Math.pow(cur.chlo_a + cur.fosfat - meanX, 2), 0)
 
   // calculate b
   const b = meanY - m * meanX
@@ -52,7 +52,7 @@ const linearRegressionScore = (dataTrain: DataRaw.Select[], dataTest: DataRaw.Se
   const yPred = dataTest.map((data) => m * (data.chlo_a + data.fosfat) + b)
 
   // calculate yTrue
-  const yTrue = dataTest.map((data) => kelas.indexOf(data.kelas))
+  const yTrue = dataTest.map((data) => kelas.indexOf(data.kelas!))
 
   // calculate r2 score
   const r2 = 1 - yTrue.reduce((acc, cur, index) => acc + Math.pow(cur - yPred[index], 2), 0) / yTrue.reduce((acc, cur) => acc + Math.pow(cur - meanY, 2), 0)
