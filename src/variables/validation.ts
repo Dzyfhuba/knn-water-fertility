@@ -20,6 +20,11 @@ const kFoldCrossValidation:KFoldCrossValidation = (data, k = 4) => {
   for (let i = 0; i < k; i++) {
     dataParts.push(data.slice(i * dataLengthPerPart, (i + 1) * dataLengthPerPart).sort((a, b) => a.id! - b.id!))
   }
+
+  // get the rest of data
+  const restData = data.slice(k * dataLengthPerPart, dataLength).sort((a, b) => a.id! - b.id!)
+  // add rest data to the last part
+  dataParts[k - 1] = dataParts[k - 1].concat(restData)
   
   // get model score using linear regression
   const modelScore = dataParts.map((part, index) => {

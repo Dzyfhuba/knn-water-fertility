@@ -12,6 +12,7 @@ export interface GlobalState {
   getData: Thunk<GlobalState>
   updateData: Thunk<GlobalState, {data: DataRaw.Select, id: number}>
   deleteData: Thunk<GlobalState, {ids: number[]}>
+  storeData: Thunk<GlobalState, DataRaw.Select>
 
   dataPartial: DataRaw.Select[][]
   setDataPartial: Action<GlobalState, DataRaw.Select[][]>
@@ -75,7 +76,24 @@ const store = createStore<GlobalState>({
       })
     }
   }),
+  storeData: thunk(async (actions, payload) => {
+    const { data, error } = await supabase
+      .from('data_raw')
+      .insert({
+        chlo_a: payload.chlo_a || 0,
+        fosfat: payload.fosfat || 0,
+        kelas: payload.kelas || '',
+      })
+      .select('*')
 
+    if (!error) {
+      actions.getData()
+      Swal.fire({
+        ...SweetAlertOption.success,
+        text: 'Data berhasil disimpan'
+      })
+    }
+  }),
 
   dataPartial: typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('dataPartial') || '[]') : [],
   setDataPartial: action((state, payload) => {

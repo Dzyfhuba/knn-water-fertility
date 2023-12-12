@@ -50,6 +50,19 @@ const Train = () => {
                 ) : <></>
               }
             </div>
+            <h2 className={styles.subTitle + ' !text-left'}>Registered ID Per Part</h2>
+            <div>{
+              dataPartial.map((data, idx) => {
+                return (
+                  <div key={idx}>
+                    <div>table {idx + 1} (length: {data.length})</div>
+                    <span>{data.map(a => a.id).sort((a, b) => a! - b!).join('-')}</span>
+                  </div>
+                )
+              })
+            }</div>
+            <h2 className={styles.subTitle + ' !text-left'}>All Registered ID (length: {data.length})</h2>
+            <p>{data.map(a => a.id).sort((a, b) => a! - b!).join('-')}</p>
             <p>Membagi data menggunakan K-Fold Cross Validation menjadi 4 bagian seperti berikut:</p>
           </>
         ) : (

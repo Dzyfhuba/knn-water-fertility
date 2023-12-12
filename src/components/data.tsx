@@ -85,7 +85,7 @@ const Form = (props: {
 }
 
 const Data = () => {
-  const { getData, updateData, deleteData } = useStoreActions((actions) => actions)
+  const { getData, updateData, deleteData, storeData } = useStoreActions((actions) => actions)
   const { data } = useStoreState((state) => state)
   const [ids, setIds] = useState<number[]>([])
 
@@ -143,6 +143,16 @@ const Data = () => {
     })
   }
 
+  const handleCreate = () => {
+    ReactSwal.fire({
+      title: 'Create Data',
+      html: <Form onSubmit={async (formValue) => {
+        storeData(formValue)
+      }} />,
+      showConfirmButton: false,
+      showCloseButton: true
+    })
+  }
 
   return (
     <>
@@ -167,7 +177,8 @@ const Data = () => {
         </div>
         <button
           type="button"
-          className={styles.btnCreate + (ids.length ? '': ' !hidden')}
+          className={styles.btnCreate}
+          onClick={handleCreate}
         >
           Create
         </button>
