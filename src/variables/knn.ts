@@ -100,7 +100,7 @@ class KNN {
 
     console.log(predictions)
 
-    return {predictions}
+    return { predictions }
   }
 
   // calculate accuracy using confusion matrix

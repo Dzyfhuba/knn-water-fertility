@@ -15,7 +15,7 @@
 }
 
 .inputK {
-  @apply input w-full input-bordered max-w-sm
+  @apply input w-full input-bordered sm:max-w-sm min-w-max
 }
 
 .btnSubmit {

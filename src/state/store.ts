@@ -10,11 +10,16 @@ export interface GlobalState {
   data: DataRaw.Select[]
   setData: Action<GlobalState, DataRaw.Select[]>
   getData: Thunk<GlobalState>
+  updateData: Thunk<GlobalState, {data: DataRaw.Select, id: number}>
+  deleteData: Thunk<GlobalState, {ids: number[]}>
+
   dataPartial: DataRaw.Select[][]
   setDataPartial: Action<GlobalState, DataRaw.Select[][]>
   separateData: Thunk<GlobalState>
+
   isLoading: boolean
   setLoading: Action<GlobalState, boolean>
+
   kFoldCrossValidation: KFoldCrossValidationReturnType
   setKFoldCrossValidation: Action<GlobalState, KFoldCrossValidationReturnType>
 }
@@ -26,7 +31,7 @@ const store = createStore<GlobalState>({
   }),
   getData: thunk(async (actions) => {
     actions.setLoading(true)
-    const {data, error} = await supabase.from('data_raw').select('*') 
+    const { data, error } = await supabase.from('data_raw').select('*').order('id', { ascending: true })
     if (!error) {
       actions.setData(data)
     } else {
@@ -37,8 +42,40 @@ const store = createStore<GlobalState>({
       })
     }
     actions.setLoading(false)
+    console.log(data)
     return data
   }),
+  updateData: thunk(async (actions, payload) => {
+    const { data, error } = await supabase
+      .from('data_raw')
+      .update(payload.data)
+      .eq('id', payload.id)
+      .select('*')
+
+    if (!error) {
+      actions.getData()
+      Swal.fire({
+        ...SweetAlertOption.success,
+        text: 'Data berhasil diupdate'
+      })
+    }
+  }),
+  deleteData: thunk(async (actions, payload) => {
+    const { data, error } = await supabase
+      .from('data_raw')
+      .delete()
+      .in('id', payload.ids)
+      .select('*')
+
+    if (!error) {
+      actions.getData()
+      Swal.fire({
+        ...SweetAlertOption.success,
+        text: 'Data berhasil dihapus'
+      })
+    }
+  }),
+
 
   dataPartial: typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('dataPartial') || '[]') : [],
   setDataPartial: action((state, payload) => {
@@ -56,7 +93,7 @@ const store = createStore<GlobalState>({
     localStorage.setItem('dataPartial', JSON.stringify(result.dataParts))
   }),
 
-  kFoldCrossValidation: {dataParts: [], modelScore: 0},
+  kFoldCrossValidation: { dataParts: [], modelScore: 0 },
   setKFoldCrossValidation: action((state, payload) => {
     state.kFoldCrossValidation = payload
   }),

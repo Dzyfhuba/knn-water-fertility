@@ -9,6 +9,7 @@ import DataTable from './datatable'
 import { TableNode } from '@table-library/react-table-library/types/table'
 import { useStoreActions, useStoreState } from '@/state/hooks'
 import KNN, { ConfusionMatrix, Label } from '@/variables/knn'
+import getVisibleLength from '@/variables/visibleLength'
 
 const InputContainer = (props: {
   index: number
@@ -19,7 +20,7 @@ const InputContainer = (props: {
       <div>
         <label htmlFor={`chlo_a-${props.index}`} className={styles.inputLabel}>Chlo A</label>
         <input
-          type="number"
+          pattern="^\d*(\.\d{0,8})?$"
           required
           name={`chlo_a-${props.index}`}
           id={`chlo_a-${props.index}`}
@@ -30,7 +31,7 @@ const InputContainer = (props: {
       <div>
         <label htmlFor={`fosfat-${props.index}`} className={styles.inputLabel}>Fosfat</label>
         <input
-          type="number"
+          pattern="^\d*(\.\d{0,8})?$"
           required
           name={`fosfat-${props.index}`}
           id={`fosfat-${props.index}`}
@@ -57,7 +58,6 @@ const Predict = () => {
   const { data } = useStoreState(state => state)
   const { getData } = useStoreActions(actions => actions)
   const [k, setK] = useState(1)
-  const [confustionMatrix, setConfustionMatrix] = useState<ConfusionMatrix>({})
 
   useEffect(() => {
     const data = localStorage.getItem('predictData')
@@ -66,7 +66,7 @@ const Predict = () => {
     }
 
     getData()
-  }, [])
+  }, [getData])
 
   const handleFormAddPredict = (e:SyntheticEvent) => {
     e.preventDefault()
@@ -90,7 +90,8 @@ const Predict = () => {
       chlo_a: chloA,
       fosfat: fosfat[i],
       distance: undefined,
-      kelasPredict: undefined
+      kelasPredict: undefined,
+      kelas: undefined
     }))
     
     setPredictData(data)
@@ -115,6 +116,9 @@ const Predict = () => {
       distances: predictions.predictions[index].distances,
     })))
   }
+
+  const predictDataLength = getVisibleLength(predictData)
+  const dataLength = getVisibleLength(data)
 
   return (
     <div>
@@ -172,7 +176,7 @@ const Predict = () => {
 
       {/* Data Predict */}
       <h2 className={styles.subTitle}>Predict Data</h2>
-      <DataTable tableData={{ nodes: predictData as TableNode[] }} />
+      <DataTable tableData={{ nodes: predictData as TableNode[] }} length={predictDataLength} />
       
       <h2 className={styles.subTitle}>Train Data</h2>
       <DataTable tableData={{ nodes: data as TableNode[] }} />

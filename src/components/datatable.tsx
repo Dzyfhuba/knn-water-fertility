@@ -23,16 +23,26 @@ import Swal from 'sweetalert2'
 import SweetalertParams from '@/variables/sweetalert2'
 import { MdDownload } from 'react-icons/md'
 import downloadAsCSV from '@/variables/download'
+import {
+  HeaderCellSelect,
+  CellSelect,
+  useRowSelect,
+} from '@table-library/react-table-library/select'
+import { useEffect, useState } from 'react'
+
 
 type Props = {
   tableData: Data<TableNode>
+  length?: number
   downloadable?: boolean
+  onSelect?: MiddlewareFunction
 }
 
 const DataTable = (props: Props) => {
+
   const theme = useTheme({
     Table: `
-        --data-table-library_grid-template-columns: 35% 35% 35% 35% 35% 35% 35% 35%;
+        --data-table-library_grid-template-columns: 30px repeat(${props.length || 4}, minmax(0px, 1fr)) !important;
         min-width: 600px;
       `,
     BaseCell: `
@@ -54,6 +64,16 @@ const DataTable = (props: Props) => {
   const onSortChange: MiddlewareFunction = (action, state) => {
     // console.log(action, state)
   }
+
+  const onSelectChange: MiddlewareFunction = (action, state, context) => {
+    if(props.onSelect) {
+      props.onSelect(action, state, context)
+    }
+  }
+
+  const select = useRowSelect(props.tableData, {
+    onChange: onSelectChange,
+  })
 
   const sort = useSort(props.tableData, {
     onChange: onSortChange
@@ -96,37 +116,38 @@ const DataTable = (props: Props) => {
       >
         <MdDownload size={14} />
       </button>
-      <Table data={props.tableData} theme={theme} sort={sort}>
+      <Table data={props.tableData} theme={theme} sort={sort} select={select}>
         {(tableList: DataRaw.Select[]) => (
           <>
             <Header>
               <HeaderRow>
-                <HeaderCellSort sortKey='ID' resize>ID</HeaderCellSort>
-                <HeaderCellSort sortKey='CHLOROPHYLL' resize>Chlorophyll A</HeaderCellSort>
-                <HeaderCellSort sortKey='PHOSPHATE' resize>Phosphate</HeaderCellSort>
+                <HeaderCellSelect />
+                <HeaderCellSort sortKey='ID'>ID</HeaderCellSort>
+                <HeaderCellSort sortKey='CHLOROPHYLL'>Chlorophyll A</HeaderCellSort>
+                <HeaderCellSort sortKey='PHOSPHATE'>Phosphate</HeaderCellSort>
                 {
                   // tableList has kelas
                   tableList[0]?.kelas !== undefined
                     ? (
-                      <HeaderCellSort sortKey='FERTILITY' resize>Fertility</HeaderCellSort>
+                      <HeaderCellSort sortKey='FERTILITY'>Fertility</HeaderCellSort>
                     ) : <></>
                 }
                 {
                   // tableList has kelasPredict
                   tableList[0]?.kelasPredict !== undefined
                     ? (
-                      <HeaderCellSort sortKey='FERTILITY_PREDICT' resize>Fertility Predict</HeaderCellSort>
+                      <HeaderCellSort sortKey='FERTILITY_PREDICT'>Fertility Predict</HeaderCellSort>
                     ) : <></>
                 }
                 {
                   // tableList has distance
                   tableList[0]?.distance !== undefined
                     ? (
-                      <HeaderCellSort sortKey='DISTANCE' resize>Distance</HeaderCellSort>
+                      <HeaderCellSort sortKey='DISTANCE'>Distance</HeaderCellSort>
                     ) : <></>
                 }
-                <HeaderCellSort sortKey='CREATED_AT' resize hide>Created At</HeaderCellSort>
-                <HeaderCellSort sortKey='UPDATED_AT' resize hide>Updated At</HeaderCellSort>
+                <HeaderCellSort sortKey='CREATED_AT' hide>Created At</HeaderCellSort>
+                <HeaderCellSort sortKey='UPDATED_AT' hide>Updated At</HeaderCellSort>
               </HeaderRow>
             </Header>
             <Body>
@@ -160,29 +181,47 @@ const DataTable = (props: Props) => {
                                 </>
                               ) : <></>
                             }
-                            <span>Dibuat:</span> <time>{Time.format(item.created_at)}</time>
-                            <span>Diubah:</span> <time>{Time.format(item.updated_at)}</time>
+                            {
+                              // has created_at
+                              item.created_at ? (
+                                <>
+                                  <span>Dibuat:</span> <span>{Time.format(item.created_at)}</span>
+                                </>
+                              ) : <></>
+                            }
+                            {
+                              // has updated_at
+                              item.updated_at ? (
+                                <>
+                                  <span>Diubah:</span> <span>{Time.format(item.updated_at)}</span>
+                                </>
+                              ) : <></>
+                            }
                           </div>
-                          <table className={styles.sweetAlertTable}>
-                            <thead>
-                              <tr>
-                                <th>Label</th>
-                                <th>Distance</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {
-                                item.distances?.length ? (
-                                  item.distances.map((distance, idx) => (
-                                    <tr key={idx}>
-                                      <td>{distance.label}</td>
-                                      <td>{distance.distance}</td>
-                                    </tr>
-                                  ))
-                                ) : <></>
-                              }
-                            </tbody>
-                          </table>
+                          {
+                            item.distances ? (
+                              <table className={styles.sweetAlertTable}>
+                                <thead>
+                                  <tr>
+                                    <th>Label</th>
+                                    <th>Distance</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {
+                                    item.distances?.length ? (
+                                      item.distances.map((distance, idx) => (
+                                        <tr key={idx}>
+                                          <td>{distance.label}</td>
+                                          <td>{distance.distance}</td>
+                                        </tr>
+                                      ))
+                                    ) : <></>
+                                  }
+                                </tbody>
+                              </table>
+                            ) : <></>
+                          }
                         </>
                       ),
                       ...SweetalertParams.info
@@ -190,6 +229,7 @@ const DataTable = (props: Props) => {
                   }}
                   className='hover:cursor-pointer'
                 >
+                  <CellSelect item={item as TableNode} />
                   <Cell pinLeft>{item.id}</Cell>
                   <Cell>{item.chlo_a}</Cell>
                   <Cell>{item.fosfat}</Cell>

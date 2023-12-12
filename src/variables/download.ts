@@ -15,7 +15,7 @@ const downloadAsCSV = <T>(data: T[], filename: string) => {
   })
 
   // create blob
-  const blob = new Blob([csv], {type: 'text/csv'})
+  const blob = new Blob([csv], { type: 'text/csv' })
   
   // filename
   const a = document.createElement('a')

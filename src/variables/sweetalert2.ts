@@ -18,6 +18,12 @@ const SweetalertParams: Params = {
     title: 'Info',
     confirmButtonText: 'Close',
     showCloseButton: true
+  },
+  success: {
+    confirmButtonColor: Colors.success,
+    icon: 'success',
+    title: 'Success',
+    confirmButtonText: 'Close'
   }
 }
 

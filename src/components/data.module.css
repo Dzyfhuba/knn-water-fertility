@@ -5,3 +5,48 @@
 .loadingContainer {
   @apply w-screen h-[60vh] flex justify-center content-center
 }
+
+.btnDelete {
+  @apply btn btn-error
+}
+
+.btnEdit {
+  @apply btn btn-warning
+}
+
+.btnCreate {
+  @apply btn btn-primary
+}
+
+.actionGroup {
+  @apply flex flex-col-reverse sm:flex-row justify-between gap-3 sticky top-0 z-40
+}
+
+.actionGroup > * {
+  @apply flex gap-3 sticky top-0 z-40
+}
+
+.actionGroup > *:last-child {
+  @apply w-max self-end
+}
+
+.formContainer {
+  @apply flex flex-col gap-3
+}
+
+.formInput {
+  @apply input input-bordered w-full
+}
+
+.inputLabel {
+  @apply label w-max after:content-['*'] after:ml-0.5 after:text-red-500
+}
+
+.btnSubmit {
+  @apply btn btn-success
+}
+
+
+.formSelect {
+  @apply select select-bordered w-full
+}

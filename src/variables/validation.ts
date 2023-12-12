@@ -27,7 +27,7 @@ const kFoldCrossValidation:KFoldCrossValidation = (data, k = 4) => {
     const dataTest = part
     return linearRegressionScore(dataTrain, dataTest)
   })
-  return {dataParts, modelScore: modelScore.reduce((acc, cur) => acc + cur, 0) / modelScore.length}
+  return { dataParts, modelScore: modelScore.reduce((acc, cur) => acc + cur, 0) / modelScore.length }
 }
 
 export default kFoldCrossValidation

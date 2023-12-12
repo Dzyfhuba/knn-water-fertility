@@ -10,6 +10,7 @@ import Swal from 'sweetalert2'
 import SweetalertParams from '@/variables/sweetalert2'
 import kFoldCrossValidation from '@/variables/validation'
 import { TableNode } from '@table-library/react-table-library/types/table'
+import getVisibleLength from '@/variables/visibleLength'
 
 
 const Test = () => {
@@ -147,6 +148,7 @@ const Test = () => {
     }
   }
 
+  const calculatedDataLength = getVisibleLength(calculatedData)
 
 
   return (
@@ -159,7 +161,7 @@ const Test = () => {
       }}>
         <input 
           type="number" 
-          className={styles.inputK + ' join-item'} 
+          className={styles.inputK + ' sm:join-item w-full'} 
           placeholder='Insert K here... (Default: K=1)' 
           onChange={(e) => {
             setK(Number(e.target.value))
@@ -167,7 +169,7 @@ const Test = () => {
         />
         <button
           type='submit'
-          className={styles.testButton + ' join-item'}
+          className={styles.testButton + ' sm:join-item w-full sm:w-max'}
           disabled={!!!(k%2)}
         >
         Predict With Test Data
@@ -192,7 +194,7 @@ const Test = () => {
       
       <h2>Hasil Prediksi Data Test</h2>
       <p>Length: {calculatedData.length}</p>
-      <DataTable tableData={{ nodes: calculatedData as TableNode[] }} />
+      <DataTable tableData={{ nodes: calculatedData as TableNode[] }} length={calculatedDataLength > 0 ? calculatedDataLength : 6} />
 
       <h2>Train Data</h2>
       <p>Length: {dataTrain.length}</p>
