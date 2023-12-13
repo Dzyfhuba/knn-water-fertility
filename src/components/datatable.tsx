@@ -179,7 +179,7 @@ const DataTable = (props: Props) => {
                             }
                             {
                               // has distance
-                              item.distance ? (
+                              typeof item.distance !== 'undefined' ? (
                                 <>
                                   <span>Jarak:</span> <span>{item.distance}</span>
                                 </>
@@ -187,7 +187,7 @@ const DataTable = (props: Props) => {
                             }
                             {
                               // has created_at
-                              item.created_at ? (
+                              typeof item.created_at !== 'undefined' ? (
                                 <>
                                   <span>Dibuat:</span> <span>{Time.format(item.created_at)}</span>
                                 </>
@@ -195,7 +195,7 @@ const DataTable = (props: Props) => {
                             }
                             {
                               // has updated_at
-                              item.updated_at ? (
+                              typeof item.updated_at !== 'undefined' ? (
                                 <>
                                   <span>Diubah:</span> <span>{Time.format(item.updated_at)}</span>
                                 </>
@@ -203,7 +203,7 @@ const DataTable = (props: Props) => {
                             }
                           </div>
                           {
-                            item.distances ? (
+                            typeof item.distances !== 'undefined' ? (
                               <table className={styles.sweetAlertTable}>
                                 <thead>
                                   <tr>
@@ -253,7 +253,7 @@ const DataTable = (props: Props) => {
                   }
                   {
                     // has distance
-                    item.distance ? (
+                    typeof item.distance !== 'undefined' ? (
                       <Cell>{item.distance}</Cell>
                     ) : <></>
                   }
