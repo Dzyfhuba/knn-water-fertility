@@ -1,5 +1,5 @@
 import Navbar from '@/components/navbar'
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import styles from './layout.module.css'
@@ -13,7 +13,6 @@ export const metadata: Metadata = {
   title: process.env.NEXT_PUBLIC_APP_NAME || 'KNN Kesuburan Air',
   description: process.env.NEXT_PUBLIC_APP_DESCRIPTION || '',
   manifest: '/manifest.json',
-  themeColor: '#5663f5',
   authors: [{ name: 'Hafidz Ubaidillah', url: 'https://hafidzubaidillah.com' }],
   robots: 'index, follow',
   icons: [
@@ -26,6 +25,10 @@ export const metadata: Metadata = {
     '/images/icons/icon-384x384.png',
     '/images/icons/icon-512x512.png'
   ],
+}
+
+export const viewport: Viewport = {
+  themeColor: '#5663f5'
 }
 
 export default function RootLayout({
