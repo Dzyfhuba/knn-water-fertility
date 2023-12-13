@@ -13,6 +13,7 @@ export interface GlobalState {
   updateData: Thunk<GlobalState, {data: DataRaw.Select, id: number}>
   deleteData: Thunk<GlobalState, {ids: number[]}>
   storeData: Thunk<GlobalState, DataRaw.Select>
+  uploadData: Thunk<GlobalState, DataRaw.Select[]>
 
   dataPartial: DataRaw.Select[][]
   setDataPartial: Action<GlobalState, DataRaw.Select[][]>
@@ -43,7 +44,6 @@ const store = createStore<GlobalState>({
       })
     }
     actions.setLoading(false)
-    console.log(data)
     return data
   }),
   updateData: thunk(async (actions, payload) => {
@@ -91,6 +91,34 @@ const store = createStore<GlobalState>({
       Swal.fire({
         ...SweetAlertOption.success,
         text: 'Data berhasil disimpan'
+      })
+    }
+  }),
+  uploadData: thunk(async (actions, payload) => {
+    Swal.update({
+      ...SweetAlertOption.loading,
+      title: 'Menyimpan data',
+      html: 'Mohon tunggu sebentar'
+    })
+    Swal.showLoading()
+    const { data, error } = await supabase
+      .from('data_raw')
+      .insert(payload.map((item) => ({
+        chlo_a: item.chlo_a || 0,
+        fosfat: item.fosfat || 0,
+        kelas: item.kelas || '',
+      })))
+      .select('*')
+
+    if (!error) {
+      actions.getData()
+      Swal.hideLoading()
+      Swal.update({
+        ...SweetAlertOption.success,
+        title: 'Berhasil',
+        showConfirmButton: true,
+        confirmButtonText: 'OK',
+        html: 'Data berhasil disimpan'
       })
     }
   }),

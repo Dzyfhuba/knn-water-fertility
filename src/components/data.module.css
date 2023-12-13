@@ -57,3 +57,51 @@
 .btnDownload {
   @apply btn btn-accent
 }
+
+.uploadArea {
+  @apply w-full h-[50vh] flex flex-col justify-center gap-3 items-center border-dashed border-neutral-500 border-2 hover:cursor-pointer
+}
+
+.uploadArea > * {
+  @apply w-1/2
+}
+
+.popup {
+  @apply !bg-base-100 !text-base-content
+}
+
+.dragEnter {
+  @apply bg-base-300
+}
+
+.formUpload {
+  @apply flex flex-col gap-3
+}
+
+.uploadArea.error {
+  @apply border-2 border-error
+}
+
+.uploadArea.success {
+  @apply border-2 border-success
+}
+
+.uploadArea .textError {
+  @apply text-error font-bold
+}
+
+.btnCancel {
+  @apply btn btn-outline
+}
+
+.btnBack {
+  @apply btn btn-primary
+}
+
+.uploadVerifyContainer {
+  @apply grid grid-cols-2 gap-3
+}
+
+.uploadVerifyContainer > *:first-child {
+  @apply col-span-2
+}

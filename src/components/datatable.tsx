@@ -41,7 +41,6 @@ type Props = {
 
 const DataTable = (props: Props) => {
   const finalLength = ((props.length || 4) - (props.enableSelect ? 0 : 1))
-  console.log({ finalLength })
 
   const theme = useTheme({
     Table: `
