@@ -12,6 +12,20 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
   title: process.env.NEXT_PUBLIC_APP_NAME || 'KNN Kesuburan Air',
   description: process.env.NEXT_PUBLIC_APP_DESCRIPTION || '',
+  manifest: '/manifest.json',
+  themeColor: '#5663f5',
+  authors: [{ name: 'Hafidz Ubaidillah', url: 'https://hafidzubaidillah.com' }],
+  robots: 'index, follow',
+  icons: [
+    '/images/icons/icon-72x72.png',
+    '/images/icons/icon-96x96.png',
+    '/images/icons/icon-128x128.png',
+    '/images/icons/icon-144x144.png',
+    '/images/icons/icon-152x152.png',
+    '/images/icons/icon-192x192.png',
+    '/images/icons/icon-384x384.png',
+    '/images/icons/icon-512x512.png'
+  ],
 }
 
 export default function RootLayout({
