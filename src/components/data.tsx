@@ -311,7 +311,7 @@ const FormUpload = (props: {
 
 const Data = () => {
   const { getData, updateData, deleteData, storeData } = useStoreActions((actions) => actions)
-  const { data } = useStoreState((state) => state)
+  const { data, isLoading } = useStoreState((state) => state)
   const [ids, setIds] = useState<number[]>([])
 
   const ReactSwal = withReactContent(Swal)
@@ -472,12 +472,12 @@ const Data = () => {
       </div>
 
       {
-        data.length ? (
-          <DataTable
+        !isLoading ? (
+          data.length ? <DataTable
             tableData={{ nodes: data as TableNode[] }}
             onSelect={handleSelect as unknown as MiddlewareFunction}
             enableSelect
-          />
+          /> : <span>No Data</span>
         ) : (
           <div className={styles.loadingContainer}>
             <Loading size='lg' />
