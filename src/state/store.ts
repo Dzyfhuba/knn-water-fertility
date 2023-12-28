@@ -10,8 +10,8 @@ export interface GlobalState {
   data: DataRaw.Select[]
   setData: Action<GlobalState, DataRaw.Select[]>
   getData: Thunk<GlobalState>
-  updateData: Thunk<GlobalState, {data: DataRaw.Select, id: number}>
-  deleteData: Thunk<GlobalState, {ids: number[]}>
+  updateData: Thunk<GlobalState, { data: DataRaw.Select, id: number }>
+  deleteData: Thunk<GlobalState, { ids: number[] }>
   storeData: Thunk<GlobalState, DataRaw.Select>
   uploadData: Thunk<GlobalState, DataRaw.Select[]>
 
@@ -37,7 +37,7 @@ const store = createStore<GlobalState>({
     if (!error) {
       actions.setData(data)
     } else {
-      
+
       Swal.fire({
         ...SweetAlertOption.error,
         text: error.message
@@ -47,11 +47,14 @@ const store = createStore<GlobalState>({
     return data
   }),
   updateData: thunk(async (actions, payload) => {
+    actions.setLoading(true)
     const { data, error } = await supabase
       .from('data_raw')
       .update(payload.data)
       .eq('id', payload.id)
       .select('*')
+
+    actions.setLoading(false)
 
     if (!error) {
       actions.getData()
@@ -62,11 +65,14 @@ const store = createStore<GlobalState>({
     }
   }),
   deleteData: thunk(async (actions, payload) => {
+    actions.setLoading(true)
     const { data, error } = await supabase
       .from('data_raw')
       .delete()
       .in('id', payload.ids)
       .select('*')
+
+    actions.setLoading(false)
 
     if (!error) {
       actions.getData()
@@ -77,6 +83,7 @@ const store = createStore<GlobalState>({
     }
   }),
   storeData: thunk(async (actions, payload) => {
+    actions.setLoading(true)
     const { data, error } = await supabase
       .from('data_raw')
       .insert({
@@ -85,6 +92,8 @@ const store = createStore<GlobalState>({
         kelas: payload.kelas || '',
       })
       .select('*')
+
+    actions.setLoading(false)
 
     if (!error) {
       actions.getData()
@@ -95,6 +104,8 @@ const store = createStore<GlobalState>({
     }
   }),
   uploadData: thunk(async (actions, payload) => {
+    actions.setLoading(true)
+
     Swal.update({
       ...SweetAlertOption.loading,
       title: 'Menyimpan data',
@@ -109,6 +120,8 @@ const store = createStore<GlobalState>({
         kelas: item.kelas || '',
       })))
       .select('*')
+
+    actions.setLoading(false)
 
     if (!error) {
       actions.getData()
