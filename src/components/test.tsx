@@ -88,7 +88,7 @@ const Test = () => {
 
         // KNN
         const model = new KNN(k)
-        model.train(dataTrainX, dataTrainY)
+        // model.train(dataTrainX, dataTrainY)
 
         model.weighted.train(dataTrainX, dataTrainY)
 
@@ -200,7 +200,7 @@ const Test = () => {
       <p>Length: {calculatedData.length}</p>
       <DataTable 
         tableData={{ nodes: calculatedData as TableNode[] }} 
-        length={calculatedDataLength-1} 
+        length={calculatedDataLength} 
       />
 
       <h2>Train Data</h2>

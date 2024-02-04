@@ -150,13 +150,6 @@ const DataTable = (props: Props) => {
                       <HeaderCellSort sortKey='DISTANCE'>Distance</HeaderCellSort>
                     ) : <></>
                 } */}
-                {/* {
-                  // tableList has distance
-                  tableList[0]?.distance !== undefined
-                    ? (
-                      <HeaderCellSort sortKey='DISTANCE'>Distance</HeaderCellSort>
-                    ) : <></>
-                } */}
                 <HeaderCellSort sortKey='CREATED_AT' hide>Created At</HeaderCellSort>
                 <HeaderCellSort sortKey='UPDATED_AT' hide>Updated At</HeaderCellSort>
               </HeaderRow>

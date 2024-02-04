@@ -103,20 +103,22 @@ const Predict = () => {
 
     const dataPredictX = predictData.map(item => [item.chlo_a, item.fosfat])
 
-    model.train(dataTrainX, dataTrainY)
-    const predictions = model.predict(dataPredictX)
+    model.weighted.train(dataTrainX, dataTrainY)
+    // const predictions = model.predict(dataPredictX)
+    const weightedPredictions = model.weighted.predict(dataPredictX)
 
     setPredictData(predictData.map((item, index) => ({
       ...item,
-      kelasPredict: predictions.predictions[index].label,
-      distance: predictions.predictions[index].distance,
-      distances: predictions.predictions[index].distances,
+      kelasPredict: weightedPredictions[index].label,
+      // distance: predictions.predictions[index].distance,
+      weights: weightedPredictions[index].weights,
+      // distances: predictions.predictions[index].distances,
     })))
   }
 
   const predictDataLength = getVisibleLength(predictData)
   const dataLength = getVisibleLength(data)
-
+  console.log(predictData)
   return (
     <div>
       <h1 className={globalStyles.title}>Predict</h1>

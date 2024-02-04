@@ -56,6 +56,9 @@ class KNN {
 
   public weighted = {
     train: (data: Feature[], labels: Label[]) => {
+      this.features = data
+      this.labels = labels
+
       // 1
       this.distanceBetweenData = data.map((item, idx) => {
         return data.map((item2, idx2) => ({
@@ -89,15 +92,15 @@ class KNN {
       })
       console.log(this.weights)
     },
-    predict:  (data: Feature[]) => {
-      if (!this.weights)  throw new Error('Please call `weighted.train` before `predict`.')
-      
+    predict: (data: Feature[]) => {
+      if (!this.weights) throw new Error('Please call `weighted.train` before `predict`.')
+
       const weightTests = data.map(item => {
         return this.features!.map((item2, idx2) => ({
           item,
           item2,
           label2: this.labels![idx2],
-          weight: this.validities![idx2].validity / (this.distance(item, item2)  + 0.5)
+          weight: this.validities![idx2].validity / (this.distance(item, item2) + 0.5)
         }))
       })
       console.log(weightTests)
@@ -109,16 +112,15 @@ class KNN {
       console.log(sortedWeightTest)
 
       // get predicted label
-      const labels = sortedWeightTest.map((items, idx) => 
-        ({
-          // item:  items[idx].item,
-          weights: items.map(item => ({
-            label: item.label2,
-            weight: item.weight
-          })),
-          label: this.majorityVote(items.map(item => 
-            item.label2).slice(0, this.k))
-        }))
+      const labels = sortedWeightTest.map((items, idx) =>({
+        // item:  items[idx].item,
+        weights: items.map(item => ({
+          label: item.label2,
+          weight: item.weight
+        })),
+        label: this.majorityVote(items.map(item =>
+          item.label2).slice(0, this.k))
+      }))
       console.log(labels)
 
       return labels
