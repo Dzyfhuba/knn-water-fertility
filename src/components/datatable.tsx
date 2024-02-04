@@ -93,7 +93,7 @@ const DataTable = (props: Props) => {
       // @ts-ignore 
       FERTILITY_PREDICT: (array) => array.sort((a, b) => a.kelasPerdict.localeCompare(b.kelasPerdict)),
       // @ts-ignore
-      DISTANCE: (array) => array.sort((a, b) => a.distance - b.distance),
+      // DISTANCE: (array) => array.sort((a, b) => a.distance - b.distance),
       // @ts-ignore 
       CREATED_AT: (array) => array.sort((a, b) => a.created_at - b.created_at),
       // @ts-ignore 
@@ -143,13 +143,20 @@ const DataTable = (props: Props) => {
                       <HeaderCellSort sortKey='FERTILITY_PREDICT'>Fertility Predict</HeaderCellSort>
                     ) : <></>
                 }
-                {
+                {/* {
                   // tableList has distance
                   tableList[0]?.distance !== undefined
                     ? (
                       <HeaderCellSort sortKey='DISTANCE'>Distance</HeaderCellSort>
                     ) : <></>
-                }
+                } */}
+                {/* {
+                  // tableList has distance
+                  tableList[0]?.distance !== undefined
+                    ? (
+                      <HeaderCellSort sortKey='DISTANCE'>Distance</HeaderCellSort>
+                    ) : <></>
+                } */}
                 <HeaderCellSort sortKey='CREATED_AT' hide>Created At</HeaderCellSort>
                 <HeaderCellSort sortKey='UPDATED_AT' hide>Updated At</HeaderCellSort>
               </HeaderRow>
@@ -203,6 +210,30 @@ const DataTable = (props: Props) => {
                             }
                           </div>
                           {
+                            typeof item.weights !== 'undefined' ? (
+                              <table className={styles.sweetAlertTable}>
+                                <thead>
+                                  <tr>
+                                    <th>Label</th>
+                                    <th>Distance</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {
+                                    item.weights?.length ? (
+                                      item.weights.map((distance, idx) => (
+                                        <tr key={idx}>
+                                          <td>{distance.label}</td>
+                                          <td>{distance.weight}</td>
+                                        </tr>
+                                      ))
+                                    ) : <></>
+                                  }
+                                </tbody>
+                              </table>
+                            ) : <></>
+                          }
+                          {/* {
                             typeof item.distances !== 'undefined' ? (
                               <table className={styles.sweetAlertTable}>
                                 <thead>
@@ -225,7 +256,7 @@ const DataTable = (props: Props) => {
                                 </tbody>
                               </table>
                             ) : <></>
-                          }
+                          } */}
                         </>
                       ),
                       ...SweetalertParams.info

@@ -46,7 +46,7 @@ const Test = () => {
           indexTrain = Array.from({ length: 3 }, () => Math.floor(Math.random() * temp.length))
           indexTest = Math.floor(Math.random() * temp.length)
         } while (indexTrain[0] === indexTrain[1] || indexTrain[0] === indexTrain[2] || indexTrain[1] === indexTrain[2] || indexTrain.includes(indexTest))
-        console.log(indexTrain, indexTest)
+        // console.log(indexTrain, indexTest)
 
         // get dataTrain and dataTest
         let dataTrain = dataPartial.filter((item, index) => indexTrain.includes(index)).flat()
@@ -58,11 +58,11 @@ const Test = () => {
         setDataTrain(dataTrain)
 
 
-        console.log({ dataTrain })
-        console.log({ dataTest })
+        // console.log({ dataTrain })
+        // console.log({ dataTest })
 
-        console.log({ indexTrain })
-        console.log({ indexTest })
+        // console.log({ indexTrain })
+        // console.log({ indexTest })
 
         setIndexTrain(indexTrain)
         setIndexTest(dataPartial.findIndex(item => item === dataTest))
@@ -90,9 +90,13 @@ const Test = () => {
         const model = new KNN(k)
         model.train(dataTrainX, dataTrainY)
 
+        model.weighted.train(dataTrainX, dataTrainY)
+
         const predictions = model.predict(dataTestX)
 
-        console.log({ predictions })
+        const weightedPredictions = model.weighted.predict(dataTestX)
+
+        // console.log({ predictions })
       
         // merge dataTestX, dataTestY back to {chlo_a, fosfat, kelas}
         const dataTestXY = dataTestX.map((item, index) => {
@@ -110,20 +114,20 @@ const Test = () => {
             chlo_a: item.chlo_a,
             fosfat: item.fosfat,
             kelas: item.kelas,
-            kelasPredict: predictions.predictions[index].label,
-            distance: predictions.predictions[index].distance,
-            distances: predictions.predictions[index].distances,
+            kelasPredict: weightedPredictions[index].label,
+            // distance: weightedPredictions[index].distance,
+            weights: weightedPredictions[index].weights,
             created_at: dataTestRest[index].created_at,
             updated_at: dataTestRest[index].updated_at,
           }
         })
 
-        console.log({ dataTestXYPredict })
+        // console.log({ dataTestXYPredict })
 
         // calculate confusion matrix
         const confustionMatrix = model.confusionMatrix(dataTestY, predictions.predictions.map(item => item.label))
 
-        // console.log({confustionMatrix})
+        console.log({ confustionMatrix })
 
         // sort dataTestXYPredict
         dataTestXYPredict.sort((a, b) => a.id! - b.id!)
@@ -138,7 +142,7 @@ const Test = () => {
       }
 
     } catch (error) {
-      console.log(error)
+      // console.log(error)
       Swal.fire({
         icon: 'error',
         title: 'Oops...',
@@ -196,7 +200,7 @@ const Test = () => {
       <p>Length: {calculatedData.length}</p>
       <DataTable 
         tableData={{ nodes: calculatedData as TableNode[] }} 
-        length={calculatedDataLength} 
+        length={calculatedDataLength-1} 
       />
 
       <h2>Train Data</h2>

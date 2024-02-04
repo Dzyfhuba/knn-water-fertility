@@ -1,3 +1,5 @@
+import _ from 'lodash'
+
 type Feature = number[]
 export type Label = 'Eutrofik' | 'Oligotrofik' | 'Mesotrofik'
 
@@ -5,7 +7,7 @@ export type KNNReturnType = {
   predictions: {
     label: Label
     distance: number
-    distances: {label: Label, distance: number}[]
+    distances: { label: Label, distance: number }[]
   }[]
 }
 
@@ -24,6 +26,25 @@ class KNN {
   private k: number
   private features?: Feature[]
   private labels?: Label[]
+  private distanceBetweenData?: {
+    item: Feature;
+    label: Label;
+    item2: Feature;
+    label2: Label;
+    distance: number;
+  }[][]
+  private validities?: {
+    data: Feature[];
+    validity: number;
+  }[]
+  private weights?: {
+    item: Feature;
+    label: Label;
+    item2: Feature;
+    label2: Label;
+    distance: number;
+    weight: number;
+  }[][]
 
   constructor(k: number) {
     // k is must odd
@@ -31,6 +52,77 @@ class KNN {
       throw new Error('k must be odd')
     }
     this.k = k
+  }
+
+  public weighted = {
+    train: (data: Feature[], labels: Label[]) => {
+      // 1
+      this.distanceBetweenData = data.map((item, idx) => {
+        return data.map((item2, idx2) => ({
+          item,
+          label: labels[idx],
+          item2,
+          label2: labels[idx2],
+          distance: this.distance(item, item2)
+        }))
+      })
+      console.log(this.distanceBetweenData)
+
+      // 2
+      this.validities = this.distanceBetweenData.map(item => {
+        return {
+          data,
+          validity: _.orderBy(item, 'distance', 'asc')
+            .slice(0, this.k)
+            .map(item => item.label === item.label2 ? 1 : 0 as number)
+            .reduce((acc, curr) => acc + curr, 0) / this.k,
+        }
+      })
+      console.log(this.validities)
+
+      // 3
+      this.weights = this.distanceBetweenData.map(item => {
+        return item.map((item2, idx2) => ({
+          weight: this.validities![idx2].validity / (item2.distance + 0.5),
+          ...item2,
+        }))
+      })
+      console.log(this.weights)
+    },
+    predict:  (data: Feature[]) => {
+      if (!this.weights)  throw new Error('Please call `weighted.train` before `predict`.')
+      
+      const weightTests = data.map(item => {
+        return this.features!.map((item2, idx2) => ({
+          item,
+          item2,
+          label2: this.labels![idx2],
+          weight: this.validities![idx2].validity / (this.distance(item, item2)  + 0.5)
+        }))
+      })
+      console.log(weightTests)
+
+      // order weight voting descending
+      const sortedWeightTest = weightTests.map((items, idx) => {
+        return _.orderBy(items, 'weight', 'desc')
+      })
+      console.log(sortedWeightTest)
+
+      // get predicted label
+      const labels = sortedWeightTest.map((items, idx) => 
+        ({
+          // item:  items[idx].item,
+          weights: items.map(item => ({
+            label: item.label2,
+            weight: item.weight
+          })),
+          label: this.majorityVote(items.map(item => 
+            item.label2).slice(0, this.k))
+        }))
+      console.log(labels)
+
+      return labels
+    }
   }
 
   public getK(): number {
@@ -77,12 +169,12 @@ class KNN {
   }
 
   // predict label
-  public predict(features: Feature[]): KNNReturnType {
+  public predict(data: Feature[]): KNNReturnType {
     if (!this.features || !this.labels) {
       throw new Error('train the model first')
     }
 
-    const predictions = features.map((feature) => {
+    const predictions = data.map((feature) => {
       const distances = this.features!.map((f) => this.distance(feature, f))
       const sortedDistances = distances.map((distance, index) => ({
         distance,
@@ -103,8 +195,31 @@ class KNN {
     return { predictions }
   }
 
+
+  public weightedPredict(data: Feature[], actual: Label[]) {
+    if (!this.features || !this.labels) {
+      throw new Error('train the model first')
+    }
+    console.log({ data, actual })
+    if (data.length !== actual.length) {
+      throw new Error('data and labels must have same length')
+    }
+
+    const predictions = data.map((item, idx1) => {
+      // validity
+      const distances = this.features!.map((f) => this.distance(item, f))
+      const sortedDistances = distances.map((distance, idx2) => ({
+        distance,
+        label: this.labels![idx2],
+        similarity: actual[idx1] === this.labels![idx2] ? 1 : 0,
+        actual: actual[idx1],
+      })).sort((a, b) => a.distance - b.distance)
+      const validity = _.sumBy(sortedDistances, 'similarity') / this.k
+    })
+  }
+
   // calculate accuracy using confusion matrix
-  public confusionMatrix(predictions: Label[], labels: Label[]):ConfusionMatrix  {
+  public confusionMatrix(predictions: Label[], labels: Label[]): ConfusionMatrix {
     if (predictions.length !== labels.length) {
       throw new Error('predictions and labels must have the same length')
     }
