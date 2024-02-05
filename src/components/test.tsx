@@ -11,6 +11,8 @@ import SweetalertParams from '@/variables/sweetalert2'
 import kFoldCrossValidation from '@/variables/validation'
 import { TableNode } from '@table-library/react-table-library/types/table'
 import getVisibleLength from '@/variables/visibleLength'
+import Procedure from './procedure'
+import Process from '@/types/procedure'
 
 
 const Test = () => {
@@ -22,15 +24,19 @@ const Test = () => {
   const [dataTrain, setDataTrain] = useState<DataRaw.Select[]>([])
   const [k, setK] = useState(1)
 
+  const [process, setProcess] = useState<Process[]>([])
+
   useEffect(() => {
     const dataTestXYPredict = localStorage.getItem('dataTestXYPredict')
     const confustionMatrix = localStorage.getItem('confustionMatrix')
     const trainData = localStorage.getItem('trainData')
+    const proce = localStorage.getItem('testProcess')
 
-    if (dataTestXYPredict && confustionMatrix && trainData) {
+    if (dataTestXYPredict && confustionMatrix && trainData && proce) {
       setCalculatedData(JSON.parse(dataTestXYPredict))
       setConfustionMatrix(JSON.parse(confustionMatrix))
       setDataTrain(JSON.parse(trainData))
+      setProcess(JSON.parse(proce))
     }
   }, [])
 
@@ -125,7 +131,7 @@ const Test = () => {
         // console.log({ dataTestXYPredict })
 
         // calculate confusion matrix
-        const confustionMatrix = model.confusionMatrix(dataTestY, predictions.predictions.map(item => item.label))
+        const confustionMatrix = model.confusionMatrix(dataTestY, weightedPredictions.map(item => item.label))
 
         console.log({ confustionMatrix })
 
@@ -135,10 +141,62 @@ const Test = () => {
         setCalculatedData(dataTestXYPredict)
         setConfustionMatrix(confustionMatrix)
 
+        // set process
+        const proce = [
+          {
+            title: 'Distance Between Train Data',
+            content: (
+              <table className='table'>
+                <thead>
+                  <tr>
+                    <th>Chlorophyll A</th>
+                    <th>Phosphate</th>
+                    <th>Class</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {model.getDistanceBetweenData()?.map((_, idx) => (
+                    <tr key={idx}>
+                      <td>{dataTrainX[idx][0]}</td>
+                      <td>{dataTrainX[idx][1]}</td>
+                      <td>{dataTrainY[idx]}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )
+          },
+          {
+            title: 'Distance Between Train Data',
+            content: (
+              <table className='table'>
+                <thead>
+                  <tr>
+                    <th>Chlorophyll A</th>
+                    <th>Phosphate</th>
+                    <th>Class</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {model.getDistanceBetweenData()?.map((_, idx) => (
+                    <tr key={idx}>
+                      <td>{dataTrainX[idx][0]}</td>
+                      <td>{dataTrainX[idx][1]}</td>
+                      <td>{dataTrainY[idx]}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )
+          },
+        ]
+        setProcess(proce)
+
         // store dataTestXYPredict and confustionMatrix to localStorage
         localStorage.setItem('dataTestXYPredict', JSON.stringify(dataTestXYPredict))
         localStorage.setItem('confustionMatrix', JSON.stringify(confustionMatrix))
         localStorage.setItem('trainData', JSON.stringify(dataTrain))
+        localStorage.setItem('testProcess', JSON.stringify(proce))
       }
 
     } catch (error) {
@@ -158,6 +216,8 @@ const Test = () => {
   return (
     <div>
       <h1 className={globalStyles.title}>Test</h1>
+
+      <Procedure process={process} />
 
       <form className={styles.kForm+' join'} onSubmit={(e) => {
         e.preventDefault()

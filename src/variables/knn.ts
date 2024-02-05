@@ -45,6 +45,18 @@ class KNN {
     distance: number;
     weight: number;
   }[][]
+  private weightTests?: {
+    item: Feature;
+    item2: Feature;
+    label2: Label;
+    weight: number;
+  }[][]
+  private sortedWeightTest?: {
+    item: Feature;
+    item2: Feature;
+    label2: Label;
+    weight: number;
+  }[][]
 
   constructor(k: number) {
     // k is must odd
@@ -95,7 +107,7 @@ class KNN {
     predict: (data: Feature[]) => {
       if (!this.weights) throw new Error('Please call `weighted.train` before `predict`.')
 
-      const weightTests = data.map(item => {
+      this.weightTests = data.map(item => {
         return this.features!.map((item2, idx2) => ({
           item,
           item2,
@@ -103,16 +115,16 @@ class KNN {
           weight: this.validities![idx2].validity / (this.distance(item, item2) + 0.5)
         }))
       })
-      console.log(weightTests)
+      console.log(this.weightTests)
 
       // order weight voting descending
-      const sortedWeightTest = weightTests.map((items, idx) => {
+      this.sortedWeightTest = this.weightTests.map((items, idx) => {
         return _.orderBy(items, 'weight', 'desc')
       })
-      console.log(sortedWeightTest)
+      console.log(this.sortedWeightTest)
 
       // get predicted label
-      const labels = sortedWeightTest.map((items, idx) =>({
+      const labels = this.sortedWeightTest.map((items, idx) => ({
         // item:  items[idx].item,
         weights: items.map(item => ({
           label: item.label2,
@@ -126,6 +138,20 @@ class KNN {
       return labels
     }
   }
+
+  public getDistanceBetweenData() {
+    return this.distanceBetweenData
+  }
+  public getValidites() {
+    return this.validities
+  }
+  public getWeights() {
+    return this.weights
+  }
+  public getWeightTests() {
+    return this.weightTests
+  }
+
 
   public getK(): number {
     return this.k
