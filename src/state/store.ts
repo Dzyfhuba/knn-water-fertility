@@ -1,3 +1,4 @@
+import { detectColorScheme } from '@/hooks/theme'
 import DataRaw from '@/types/data-raw'
 import supabase from '@/variables/supabase'
 import SweetAlertOption from '@/variables/sweetalert2'
@@ -24,6 +25,9 @@ export interface GlobalState {
 
   kFoldCrossValidation: KFoldCrossValidationReturnType
   setKFoldCrossValidation: Action<GlobalState, KFoldCrossValidationReturnType>
+
+  theme: 'light' | 'dark'
+  setTheme: Action<GlobalState, 'light' | 'dark'>
 }
 
 const store = createStore<GlobalState>({
@@ -160,6 +164,11 @@ const store = createStore<GlobalState>({
   isLoading: false,
   setLoading: action((state, payload) => {
     state.isLoading = payload
+  }),
+
+  theme: detectColorScheme(),
+  setTheme: action((state, payload) => {
+    state.theme = payload
   })
 })
 

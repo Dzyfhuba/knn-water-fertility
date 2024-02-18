@@ -13,6 +13,8 @@ import { TableNode } from '@table-library/react-table-library/types/table'
 import getVisibleLength from '@/variables/visibleLength'
 import Procedure from './procedure'
 import Process from '@/types/procedure'
+import DataTable2 from './DataTable2'
+import Client from './client'
 
 
 const Test = () => {
@@ -103,7 +105,7 @@ const Test = () => {
         const weightedPredictions = model.weighted.predict(dataTestX)
 
         // console.log({ predictions })
-      
+
         // merge dataTestX, dataTestY back to {chlo_a, fosfat, kelas}
         const dataTestXY = dataTestX.map((item, index) => {
           return {
@@ -167,26 +169,38 @@ const Test = () => {
             )
           },
           {
-            title: 'Distance Between Train Data',
+            title: 'Validasi Data Training',
             content: (
-              <table className='table'>
-                <thead>
-                  <tr>
-                    <th>Chlorophyll A</th>
-                    <th>Phosphate</th>
-                    <th>Class</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {model.getDistanceBetweenData()?.map((_, idx) => (
-                    <tr key={idx}>
-                      <td>{dataTrainX[idx][0]}</td>
-                      <td>{dataTrainX[idx][1]}</td>
-                      <td>{dataTrainY[idx]}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <Client>
+                <DataTable2
+                  columns={[
+                    {
+                      id: 'chloA',
+                      title: 'Chlorophile A',
+                      sort: false,
+                      width: 'auto',
+                    },
+                    {
+                      id: 'phosphate',
+                      title: 'Fosfat',
+                      sort: false,
+                      width: 'auto',
+                    },
+                    {
+                      id: 'label',
+                      title: 'Label',
+                      sort: false,
+                      width: 'auto',
+                    },
+                  ]}
+                  data={
+                    model.getValidites()!.map((item, idx) => ({
+                      chloA: item.data[idx][0],
+                      phosphate: item.data[idx][1],
+                      label: dataTrainY[idx],
+                    }))}
+                />
+              </Client>
             )
           },
         ]
@@ -219,14 +233,14 @@ const Test = () => {
 
       <Procedure process={process} />
 
-      <form className={styles.kForm+' join'} onSubmit={(e) => {
+      <form className={styles.kForm + ' join'} onSubmit={(e) => {
         e.preventDefault()
         handlePredict()
       }}>
-        <input 
-          type="number" 
-          className={styles.inputK + ' sm:join-item w-full'} 
-          placeholder='Insert K here... (Default: K=1)' 
+        <input
+          type="number"
+          className={styles.inputK + ' sm:join-item w-full'}
+          placeholder='Insert K here... (Default: K=1)'
           onChange={(e) => {
             setK(Number(e.target.value))
           }}
@@ -234,15 +248,15 @@ const Test = () => {
         <button
           type='submit'
           className={styles.testButton + ' sm:join-item w-full sm:w-max'}
-          disabled={!!!(k%2)}
+          disabled={!!!(k % 2)}
         >
-        Predict With Test Data
+          Predict With Test Data
         </button>
       </form>
 
 
-      <p>Tabel {indexTrain.map(i => i+1).join('-')} sebagai train.</p>
-      <p>Tabel {indexTest+1} sebagai test.</p>
+      <p>Tabel {indexTrain.map(i => i + 1).join('-')} sebagai train.</p>
+      <p>Tabel {indexTest + 1} sebagai test.</p>
 
       <h2>Confusion Matrix</h2>
       <div className={styles.confusionMatrix}>
@@ -255,12 +269,12 @@ const Test = () => {
         }
       </div>
 
-      
+
       <h2>Hasil Prediksi Data Test</h2>
       <p>Length: {calculatedData.length}</p>
-      <DataTable 
-        tableData={{ nodes: calculatedData as TableNode[] }} 
-        length={calculatedDataLength} 
+      <DataTable
+        tableData={{ nodes: calculatedData as TableNode[] }}
+        length={calculatedDataLength}
       />
 
       <h2>Train Data</h2>
