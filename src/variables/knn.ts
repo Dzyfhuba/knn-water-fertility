@@ -36,6 +36,7 @@ class KNN {
   private validities?: {
     data: Feature[];
     validity: number;
+    dataSortedByDistance: { data: Feature, distance: number, label: Label, validity: number }[]
   }[]
   private weights?: {
     item: Feature;
@@ -85,12 +86,21 @@ class KNN {
 
       // 2
       this.validities = this.distanceBetweenData.map(item => {
+        const dataSortedByDistance = _.orderBy(item, 'distance', 'asc')
         return {
           data,
-          validity: _.orderBy(item, 'distance', 'asc')
+          validity: dataSortedByDistance
             .slice(0, this.k)
             .map(item => item.label === item.label2 ? 1 : 0 as number)
             .reduce((acc, curr) => acc + curr, 0) / this.k,
+          dataSortedByDistance: dataSortedByDistance
+            .slice(0, this.k)
+            .map(item => ({
+              data: item.item2,
+              label: item.label2,
+              distance: item.distance,
+              validity: item.label === item.label2 ? 1 : 0 as number
+            }))
         }
       })
       console.log(this.validities)

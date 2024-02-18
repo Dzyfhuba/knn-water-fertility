@@ -31,6 +31,11 @@ import useSwal from '@/hooks/Sweetalert'
 import useAxios from '@/hooks/Axios'
 import { AxiosError } from 'axios'
 import { redirect, useRouter } from 'next/navigation'
+import {
+  CellTree,
+  TreeExpandClickTypes,
+  useTree
+} from '@table-library/react-table-library/tree'
 
 const CellSelect = (props: HTMLAttributes<HTMLElement> & {
   item: TableNode
@@ -67,7 +72,7 @@ type Props<T> = {
   }
   lazy?: boolean,
   remainingData?: boolean,
-
+  enableTree?: boolean
 }
 
 const DataTable2 = <T extends object>(props: Props<T>) => {
@@ -85,14 +90,14 @@ const DataTable2 = <T extends object>(props: Props<T>) => {
   const data = {
     nodes: props.data.map((e, i) => ({ id: i + 1, ...e }))
   }
-  if (props.columns.length !== Object.keys(props.data[0]).length) {
+  if (props.columns.length !== Object.keys(props.data[0]).filter(e => e != 'nodes').length) {
     console.error('Columns Length and Data Shape not same')
     console.error('Columns Length: ', props.columns.length)
     console.error('Data Shape: ', Object.keys(props.data[0]).length)
     console.error('Columns: ', props.columns)
     console.error('Data: ', props.data)
-
-    const diff = findArrayDifferences(Object.keys(props.data[0]), props.columns.map(e => e.id))
+    // console.log(Object.keys(props.data[0]).filter(e => e != 'nodes'))
+    const diff = findArrayDifferences(Object.keys(props.data[0]).filter(e => e != 'nodes'), props.columns.map(e => e.id))
     console.error('Diff: ', diff)
 
     return (
@@ -106,6 +111,15 @@ const DataTable2 = <T extends object>(props: Props<T>) => {
 
   const columns = props.columns.filter(e => !e.hide)
 
+  const onTreeChange: MiddlewareFunction = (action, state) => {
+
+  }
+
+  const tree = useTree(data, {
+    onChange: onTreeChange
+  }, {
+    clickType: TreeExpandClickTypes.ButtonClick
+  })
 
   const headerRowGridTC = columns.map((column) => {
     if (column.hide) return ''
@@ -117,7 +131,7 @@ const DataTable2 = <T extends object>(props: Props<T>) => {
 
   const theme = useTheme({
     Table: `
-      --data-table-library_grid-template-columns: repeat(${props.enableSelect ? '2' : 1}, auto) ${headerRowGridTC} !important;
+      --data-table-library_grid-template-columns: repeat(${props.enableSelect ? '2' : 1}, auto) ${props.enableTree ? 'repeat(1, auto)' : ''} ${headerRowGridTC} !important;
       border-radius: 0px !important;
     `,
     BaseCell: `
@@ -231,6 +245,7 @@ const DataTable2 = <T extends object>(props: Props<T>) => {
     <>
       <Table
         data={data}
+        tree={props.enableTree ? tree : undefined}
         theme={theme}
         select={select}
         layout={{ custom: true, horizontalScroll: true }}
@@ -245,6 +260,10 @@ const DataTable2 = <T extends object>(props: Props<T>) => {
                       <HeaderCellSelect className={styles.headerCell} />
                     ) : <></>
                   }
+                  {props.enableTree ? (
+                    <HeaderCell className={styles.headerCell}>
+                    </HeaderCell>
+                  ) : <></>}
                   <HeaderCell className={styles.headerCell}>
                     No
                   </HeaderCell>
@@ -317,6 +336,14 @@ const DataTable2 = <T extends object>(props: Props<T>) => {
                         props.rowClick?.onClick?.(node as T & TableNode, e)
                       }}
                     >
+                      {
+                        props.enableTree ? (
+                          <CellTree
+                            item={row}
+                          >
+                          </CellTree>
+                        ) : <></>
+                      }
                       {
                         props.enableSelect ? (
                           <CellSelect

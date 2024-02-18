@@ -24,7 +24,7 @@ const Test = () => {
   const [indexTrain, setIndexTrain] = useState<number[]>([])
   const [indexTest, setIndexTest] = useState<number>(0)
   const [dataTrain, setDataTrain] = useState<DataRaw.Select[]>([])
-  const [k, setK] = useState(1)
+  const [k, setK] = useState(5)
 
   const [process, setProcess] = useState<Process[]>([])
 
@@ -179,6 +179,7 @@ const Test = () => {
                       title: 'Chlorophile A',
                       sort: false,
                       width: 'auto',
+                      hide: true
                     },
                     {
                       id: 'phosphate',
@@ -192,13 +193,28 @@ const Test = () => {
                       sort: false,
                       width: 'auto',
                     },
+                    {
+                      id: 'validity',
+                      title: 'Validity',
+                      sort: false,
+                      width: 'auto',
+                    },
                   ]}
                   data={
                     model.getValidites()!.map((item, idx) => ({
                       chloA: item.data[idx][0],
                       phosphate: item.data[idx][1],
                       label: dataTrainY[idx],
+                      validity: item.validity,
+                      nodes: item.dataSortedByDistance.map((i, idx2) => ({
+                        id: `${idx+1}-${idx2+1}`,
+                        chloA: i.data[0],
+                        phosphate: i.data[1],
+                        label: i.label,
+                        validity: i.validity
+                      }))
                     }))}
+                  enableTree
                 />
               </Client>
             )
@@ -240,7 +256,7 @@ const Test = () => {
         <input
           type="number"
           className={styles.inputK + ' sm:join-item w-full'}
-          placeholder='Insert K here... (Default: K=1)'
+          placeholder='Insert K here... (Default: K=5)'
           onChange={(e) => {
             setK(Number(e.target.value))
           }}
