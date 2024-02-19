@@ -3,6 +3,7 @@ const slugify = (raw: string) => {
 }
 
 const getFirstPath = () => {
+  if (typeof window === 'undefined') return ''
   const url = window.location.pathname
   const urlArray = url.split('/')
   // console.log(urlArray[1])
@@ -10,11 +11,13 @@ const getFirstPath = () => {
 }
 
 const getFullPath = () => {
+  if (typeof window === 'undefined') return ''
   return window.location.pathname
 }
 
 // remove last path and second last path if same
 const removeLastPathAndSecondLastPathIfSame = (path: string = '') => {
+  if (typeof window === 'undefined') return ''
   const url = window.location.pathname
   const urlArray = url.split('/')
   if (urlArray.slice(-1)[0] === urlArray.slice(-2)[0]) {
@@ -25,6 +28,7 @@ const removeLastPathAndSecondLastPathIfSame = (path: string = '') => {
 }
 
 const getURLWithoutQuery = (path: string = '') => {
+  if (typeof window === 'undefined') return ''
   return window.location.origin + window.location.pathname + path
 }
 
@@ -55,6 +59,7 @@ const getURLWithQuery = (path: string = '', query: { [key: string]: string | num
 }
 
 const getURLWithoutQueryAndLastPath = (path: string = '') => {
+  if (typeof window === 'undefined') return ''
   const url = window.location.pathname
   const urlArray = url.split('/')
   urlArray.pop()
@@ -62,6 +67,7 @@ const getURLWithoutQueryAndLastPath = (path: string = '') => {
 }
 
 const getHost = (path: string = '') => {
+  if (typeof window === 'undefined') return ''
   return window.location.host + path
 }
 
@@ -93,6 +99,7 @@ function isValidDate(dateString: string) {
 const setQueryParams = (params: {
   [key: string]: string | number | boolean | null | undefined
 }) => {
+  if (typeof window === 'undefined') return ''
   const url = new URL(window.location.href)
   Object.keys(params).forEach((key) => {
     if (params[key] !== null && params[key] !== undefined) {

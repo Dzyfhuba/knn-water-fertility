@@ -6,28 +6,29 @@ import { MdOutlineWbSunny } from 'react-icons/md'
 
 //determines if the user has a set theme
 const detectColorScheme = () => {
-  let theme = 'light'    //default to light
+  if (typeof window !== 'undefined') {
+    let theme = 'light'    //default to light
 
-  //local storage is used to override OS theme settings
-  if (typeof window !== 'undefined' && localStorage.getItem('theme')) {
-    if (localStorage.getItem('theme') == 'dark') {
+    //local storage is used to override OS theme settings
+    if (typeof window !== 'undefined' && localStorage.getItem('theme')) {
+      if (localStorage.getItem('theme') == 'dark') {
+        theme = 'dark'
+      }
+    } else if (typeof window !== 'undefined' && !window.matchMedia) {
+      //matchMedia method not supported
+      return 'light'
+    } else if (typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      //OS theme setting detected as dark
       theme = 'dark'
     }
-  } else if (!window.matchMedia) {
-    //matchMedia method not supported
-    return 'light'
-  } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-    //OS theme setting detected as dark
-    theme = 'dark'
-  }
 
-  //dark theme preferred, set document with a `data-theme` attribute
-  if (theme == 'dark') {
-    document.documentElement.setAttribute('data-theme', 'dark')
-  }
+    //dark theme preferred, set document with a `data-theme` attribute
+    if (theme == 'dark') {
+      document.documentElement.setAttribute('data-theme', 'dark')
+    }
 
-  const styleElement = document.createElement('style')
-  const styleContentLight = `
+    const styleElement = document.createElement('style')
+    const styleContentLight = `
             input:-webkit-autofill,
             input:-webkit-autofill:hover,
             input:-webkit-autofill:focus,
@@ -36,7 +37,7 @@ const detectColorScheme = () => {
             -webkit-text-fill-color: black !important;
             }
         `
-  const styleContentDark = `
+    const styleContentDark = `
             input:-webkit-autofill,
             input:-webkit-autofill:hover,
             input:-webkit-autofill:focus,
@@ -46,14 +47,16 @@ const detectColorScheme = () => {
             }
         `
 
-  if (theme === 'dark') {
-    styleElement.appendChild(document.createTextNode(styleContentDark))
-  } else {
-    styleElement.appendChild(document.createTextNode(styleContentLight))
-  }
-  document.head.appendChild(styleElement)
+    if (theme === 'dark') {
+      styleElement.appendChild(document.createTextNode(styleContentDark))
+    } else {
+      styleElement.appendChild(document.createTextNode(styleContentLight))
+    }
+    document.head.appendChild(styleElement)
 
-  return theme as 'dark' | 'light'
+    return theme as 'dark' | 'light'
+  }
+  return 'dark'
 }
 
 const useTheme = () => {
@@ -72,6 +75,7 @@ const ToggleTheme = (props: Props) => {
   const { setTheme } = useStoreActions(actions => actions)
 
   const handleChangeTheme = (e: ChangeEvent<HTMLInputElement>) => {
+    if (typeof window === 'undefined') return setTheme('light')
     const theme = e.target.checked ? 'dark' : 'light'
     // add data-theme
     if (theme === 'light') {
@@ -114,7 +118,7 @@ const ToggleTheme = (props: Props) => {
 
     setTheme(theme)
 
-    if(props.setTheme) {
+    if (props.setTheme) {
       props.setTheme(theme)
     }
   }
@@ -125,11 +129,11 @@ const ToggleTheme = (props: Props) => {
     // <div {...props}>
     <label className={`swap swap-rotate w-full h-full${props.className ? ` ${props.className}` : ''}`} tabIndex={0}>
       {/* this hidden checkbox controls the state */}
-      <input 
-        type="checkbox" 
-        className="theme-controller invisible"  
+      <input
+        type="checkbox"
+        className="theme-controller invisible"
         checked={globalTheme == 'dark'}
-        onChange={handleChangeTheme} 
+        onChange={handleChangeTheme}
       />
       {/* sun icon */}
       <span className='swap-off'>

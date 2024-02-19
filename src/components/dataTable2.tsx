@@ -304,7 +304,7 @@ const DataTable2 = <T extends object>(props: Props<T>) => {
                               })
                               if (direction === 'desc') return redirect(window.location.pathname, queriesKeyValueObj)
 
-                              redirect(window.location.pathname, {
+                              redirect((typeof window === 'undefined') ? '/' : window.location.pathname, {
                                 ...queriesKeyValueObj,
                                 sort: column.id,
                                 direction: 'asc',
