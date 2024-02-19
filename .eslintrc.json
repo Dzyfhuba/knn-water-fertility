@@ -10,6 +10,7 @@
     "semi": ["error", "never"],
     "quotes": ["error", "single"],
     "indent": ["error", 2],
-    "object-curly-spacing": ["error", "always"]
+    "object-curly-spacing": ["error", "always"],
+    "react-hooks/rules-of-hooks": "never"
   }
 }

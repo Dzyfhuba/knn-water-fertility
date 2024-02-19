@@ -27,6 +27,7 @@ class KNN {
   private features?: Feature[]
   private labels?: Label[]
   private distanceBetweenData?: {
+    id: string | number
     item: Feature;
     label: Label;
     item2: Feature;
@@ -36,7 +37,13 @@ class KNN {
   private validities?: {
     data: Feature[];
     validity: number;
-    dataSortedByDistance: { data: Feature, distance: number, label: Label, validity: number }[]
+    dataSortedByDistance: {
+      id: string | number,
+      data: Feature,
+      distance: number,
+      label: Label,
+      validity: number
+    }[]
   }[]
   private weights?: {
     item: Feature;
@@ -75,6 +82,7 @@ class KNN {
       // 1
       this.distanceBetweenData = data.map((item, idx) => {
         return data.map((item2, idx2) => ({
+          id: `${idx+1}-${idx2+1}`,
           item,
           label: labels[idx],
           item2,
@@ -90,12 +98,15 @@ class KNN {
         return {
           data,
           validity: dataSortedByDistance
+            .filter(a => a.distance !== 0)
             .slice(0, this.k)
             .map(item => item.label === item.label2 ? 1 : 0 as number)
             .reduce((acc, curr) => acc + curr, 0) / this.k,
           dataSortedByDistance: dataSortedByDistance
+            .filter(a => a.distance !== 0)
             .slice(0, this.k)
             .map(item => ({
+              id: item.id,
               data: item.item2,
               label: item.label2,
               distance: item.distance,

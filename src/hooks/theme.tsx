@@ -9,7 +9,7 @@ const detectColorScheme = () => {
   let theme = 'light'    //default to light
 
   //local storage is used to override OS theme settings
-  if (localStorage.getItem('theme')) {
+  if (typeof window !== 'undefined' && localStorage.getItem('theme')) {
     if (localStorage.getItem('theme') == 'dark') {
       theme = 'dark'
     }

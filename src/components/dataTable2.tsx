@@ -24,7 +24,7 @@ import { HTMLAttributes, ReactNode, useEffect, useRef, useState } from 'react'
 import { FaSort, FaSortDown, FaSortUp } from 'react-icons/fa'
 import { MdChevronLeft, MdChevronRight } from 'react-icons/md'
 import { useIntersectionObserver } from 'usehooks-ts'
-import styles from './DataTable2.module.css'
+import styles from './dataTable2.module.css'
 import Select from './Select'
 import { capitalize, findArrayDifferences, getURLWithoutQuery, setQueryParams } from '@/variables/helpers'
 import useSwal from '@/hooks/Sweetalert'
@@ -90,7 +90,8 @@ const DataTable2 = <T extends object>(props: Props<T>) => {
   const data = {
     nodes: props.data.map((e, i) => ({ id: i + 1, ...e }))
   }
-  if (props.columns.length !== Object.keys(props.data[0]).filter(e => e != 'nodes').length) {
+  const dataKeys = Object.keys(props.data[0]).filter(e => e != 'nodes' && e != 'isSelected')
+  if (props.columns.length !== dataKeys.length) {
     console.error('Columns Length and Data Shape not same')
     console.error('Columns Length: ', props.columns.length)
     console.error('Data Shape: ', Object.keys(props.data[0]).length)
@@ -328,7 +329,11 @@ const DataTable2 = <T extends object>(props: Props<T>) => {
                     <Row
                       key={row.id}
                       item={row}
-                      className={styles.row + ' group' + (props.rowClick ? ' hover:cursor-pointer select-none' : '')}
+                      className={
+                        styles.rowc + ' group' +
+                        (props.rowClick ? ' hover:cursor-pointer select-none' : '')
+                        // + (row['isSelected'] ? ' bg-base-200': '')
+                      }
                       onDoubleClick={(node, e) => {
                         props.rowClick?.onDoubleClick?.(node as T & TableNode, e)
                       }}
@@ -359,7 +364,11 @@ const DataTable2 = <T extends object>(props: Props<T>) => {
                         columns.map((key) => (
                           <Cell
                             key={key.id}
-                            className={styles.cell + ' group-hover:!bg-base-200 group-active:!bg-base-300'}
+                            className={
+                              styles.cell 
+                              + ' group-hover:!bg-base-200 group-active:!bg-base-300'
+                              + (row['isSelected'] ? ' !bg-base-300': '')
+                            }
                           >
                             {key.type === 'date'
                               ? moment(row[key.id] as never).format('D MMMM YYYY')

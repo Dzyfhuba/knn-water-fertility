@@ -13,7 +13,7 @@ import { TableNode } from '@table-library/react-table-library/types/table'
 import getVisibleLength from '@/variables/visibleLength'
 import Procedure from './procedure'
 import Process from '@/types/procedure'
-import DataTable2 from './DataTable2'
+import DataTable2 from './dataTable2'
 import Client from './client'
 
 
@@ -148,24 +148,53 @@ const Test = () => {
           {
             title: 'Distance Between Train Data',
             content: (
-              <table className='table'>
-                <thead>
-                  <tr>
-                    <th>Chlorophyll A</th>
-                    <th>Phosphate</th>
-                    <th>Class</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {model.getDistanceBetweenData()?.map((_, idx) => (
-                    <tr key={idx}>
-                      <td>{dataTrainX[idx][0]}</td>
-                      <td>{dataTrainX[idx][1]}</td>
-                      <td>{dataTrainY[idx]}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <Client>
+                <DataTable2
+                  columns={[
+                    {
+                      id: 'chloA',
+                      title: 'Chlo A',
+                      sort: false,
+                      width: 'auto',
+                    },
+                    {
+                      id: 'fosfat',
+                      title: 'Fosfat',
+                      sort: false,
+                      width: 'auto',
+                    },
+                    {
+                      id: 'label',
+                      title: 'Label',
+                      sort: false,
+                      width: 'auto',
+                    },
+                    {
+                      id: 'distance',
+                      title: 'distance',
+                      sort: false,
+                      width: 'auto',
+                    },
+                  ]}
+                  data={
+                    model.getDistanceBetweenData()!.map((item, idx) => ({
+                      chloA: item[idx].item[0],
+                      fosfat: item[idx].item[1],
+                      label: item[idx].label,
+                      distance: '',
+                      nodes: item.sort((a, b) => a.distance - b.distance)
+                        .filter(a => a.distance !== 0).map((i, idx2) => ({
+                          id: i.id,
+                          chloA: i.item2[0],
+                          fosfat: i.item2[1],
+                          label: i.label2,
+                          distance: i.distance,
+                          isSelected: idx2 <= k,
+                        }))
+                    }))}
+                  enableTree
+                />
+              </Client>
             )
           },
           {
@@ -179,10 +208,9 @@ const Test = () => {
                       title: 'Chlorophile A',
                       sort: false,
                       width: 'auto',
-                      hide: true
                     },
                     {
-                      id: 'phosphate',
+                      id: 'fosfat',
                       title: 'Fosfat',
                       sort: false,
                       width: 'auto',
@@ -203,13 +231,13 @@ const Test = () => {
                   data={
                     model.getValidites()!.map((item, idx) => ({
                       chloA: item.data[idx][0],
-                      phosphate: item.data[idx][1],
+                      fosfat: item.data[idx][1],
                       label: dataTrainY[idx],
                       validity: item.validity,
                       nodes: item.dataSortedByDistance.map((i, idx2) => ({
-                        id: `${idx+1}-${idx2+1}`,
+                        id: i.id,
                         chloA: i.data[0],
-                        phosphate: i.data[1],
+                        fosfat: i.data[1],
                         label: i.label,
                         validity: i.validity
                       }))

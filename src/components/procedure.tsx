@@ -44,6 +44,7 @@ const Procedure = (props: Props) => {
       customClass: {
         popup: styles.popup
       },
+      width: 1000,
       html: (
         <div
           className='flex flex-col'
