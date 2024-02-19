@@ -82,7 +82,7 @@ const removeDuplicates = <T>(array: T[], key: keyof T) => {
 
 // storage path
 const assetUrl = (path: string) => {
-  return `${import.meta.env.VITE_APP_URL}${path}`
+  return `${process.env.NEXT_PUBLIC_SUPABASE_URL}${path}`
 }
 
 function isValidDate(dateString: string) {

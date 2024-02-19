@@ -156,11 +156,11 @@ const DataTable2 = <T extends object>(props: Props<T>) => {
   const select = useRowSelect(data, {
     onChange: onSelectChange,
   },
-    {
-      rowSelect: SelectTypes.MultiSelect,
-      isPartialToAll: true,
-      clickType: SelectClickTypes.ButtonClick,
-    })
+  {
+    rowSelect: SelectTypes.MultiSelect,
+    isPartialToAll: true,
+    clickType: SelectClickTypes.ButtonClick,
+  })
 
   const { Swal } = useSwal()
   const { axiosCsrf } = useAxios()
@@ -365,9 +365,9 @@ const DataTable2 = <T extends object>(props: Props<T>) => {
                           <Cell
                             key={key.id}
                             className={
-                              styles.cell 
+                              styles.cell
                               + ' group-hover:!bg-base-200 group-active:!bg-base-300'
-                              + (row['isSelected'] ? ' !bg-base-300': '')
+                              + (row['isSelected'] ? ' !bg-base-300' : '')
                             }
                           >
                             {key.type === 'date'

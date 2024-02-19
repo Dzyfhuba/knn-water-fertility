@@ -46,6 +46,7 @@ class KNN {
     }[]
   }[]
   private weights?: {
+    id: string | number
     item: Feature;
     label: Label;
     item2: Feature;
@@ -54,12 +55,14 @@ class KNN {
     weight: number;
   }[][]
   private weightTests?: {
+    id: string | number
     item: Feature;
     item2: Feature;
     label2: Label;
     weight: number;
   }[][]
   private sortedWeightTest?: {
+    id: string | number
     item: Feature;
     item2: Feature;
     label2: Label;
@@ -128,8 +131,9 @@ class KNN {
     predict: (data: Feature[]) => {
       if (!this.weights) throw new Error('Please call `weighted.train` before `predict`.')
 
-      this.weightTests = data.map(item => {
+      this.weightTests = data.map((item, idx) => {
         return this.features!.map((item2, idx2) => ({
+          id: `${idx+1}-${idx2+1}`,
           item,
           item2,
           label2: this.labels![idx2],
@@ -148,6 +152,8 @@ class KNN {
       const labels = this.sortedWeightTest.map((items, idx) => ({
         // item:  items[idx].item,
         weights: items.map(item => ({
+          id: item.id,
+          data: item.item2,
           label: item.label2,
           weight: item.weight
         })),
@@ -172,7 +178,6 @@ class KNN {
   public getWeightTests() {
     return this.weightTests
   }
-
 
   public getK(): number {
     return this.k
@@ -201,7 +206,7 @@ class KNN {
   }
 
   // majority vote
-  private majorityVote(labels: Label[]): Label {
+  public majorityVote(labels: Label[]): Label {
     const votes = labels.reduce((acc, label) => {
       if (!acc[label]) {
         acc[label] = 0

@@ -38,7 +38,7 @@ const Test = () => {
       setCalculatedData(JSON.parse(dataTestXYPredict))
       setConfustionMatrix(JSON.parse(confustionMatrix))
       setDataTrain(JSON.parse(trainData))
-      setProcess(JSON.parse(proce))
+      // setProcess(JSON.parse(proce))
     }
   }, [])
 
@@ -116,7 +116,7 @@ const Test = () => {
         })
 
         // merge dataTestXY, predictions back to {chlo_a, fosfat, kelas, kelasPredict}
-        const dataTestXYPredict: DataRaw.Select[] = dataTestXY.map((item, index) => {
+        const dataTestXYPredict = dataTestXY.map((item, index) => {
           return {
             id: dataTestRest[index].id as number,
             chlo_a: item.chlo_a,
@@ -189,7 +189,7 @@ const Test = () => {
                           fosfat: i.item2[1],
                           label: i.label2,
                           distance: i.distance,
-                          isSelected: idx2 <= k,
+                          isSelected: idx2 < k,
                         }))
                     }))}
                   enableTree
@@ -247,6 +247,116 @@ const Test = () => {
               </Client>
             )
           },
+          {
+            title: 'Perhitungan Weight Voting (Train)',
+            content: (
+              <Client>
+                <DataTable2
+                  columns={[
+                    {
+                      id: 'chloA',
+                      title: 'Chlorophile A',
+                      sort: false,
+                      width: 'auto',
+                    },
+                    {
+                      id: 'fosfat',
+                      title: 'Fosfat',
+                      sort: false,
+                      width: 'auto',
+                    },
+                    {
+                      id: 'label',
+                      title: 'Actual Label',
+                      sort: false,
+                      width: 'auto',
+                    },
+                    {
+                      id: 'weight',
+                      title: 'Weight / Predicted Label',
+                      sort: false,
+                      width: 'auto',
+                    },
+                  ]}
+                  data={
+                    model.getWeights()!.map((item, idx) => ({
+                      chloA: item[idx].item[0],
+                      fosfat: item[idx].item[1],
+                      label: item[idx].label,
+                      weight: model.majorityVote(
+                        item.sort((a, b) => b.weight - a.weight)
+                          .filter(a => a.distance !== 0).map((i, idx2) => (
+                            i.label2
+                          ))
+                          .slice(0, k)
+                      ),
+                      nodes: item.sort((a, b) => b.weight - a.weight)
+                        .filter(a => a.distance !== 0).map((i, idx2) => ({
+                          id: i.id,
+                          chloA: i.item2[0],
+                          fosfat: i.item2[1],
+                          label: i.label2,
+                          weight: i.weight,
+                          isSelected: idx2 < k,
+                        }))
+                    }))}
+                  enableTree
+                />
+              </Client>
+            )
+          },
+          {
+            title: 'Perhitungan Weight Voting (Test)',
+            content: (
+              <Client>
+                <DataTable2
+                  columns={[
+                    {
+                      id: 'chloA',
+                      title: 'Chlorophile A',
+                      sort: false,
+                      width: 'auto',
+                    },
+                    {
+                      id: 'fosfat',
+                      title: 'Fosfat',
+                      sort: false,
+                      width: 'auto',
+                    },
+                    {
+                      id: 'label',
+                      title: 'Actual Label',
+                      sort: false,
+                      width: 'auto',
+                    },
+                    {
+                      id: 'weight',
+                      title: 'Weight / Predicted Label',
+                      sort: false,
+                      width: 'auto',
+                    },
+                  ]}
+                  data={
+                    dataTestXYPredict.map((item, idx) => ({
+                      chloA: item.chlo_a,
+                      fosfat: item.fosfat,
+                      label: item.kelas,
+                      weight: item.kelasPredict,
+                      nodes: item.weights!
+                        .map((i, idx2) => ({
+                          id: i.id,
+                          chloA: i.data[0],
+                          fosfat: i.data[1],
+                          label: i.label,
+                          weight: i.weight,
+                          isSelected: idx2 < k
+                        }))
+                    }))}
+                  enableTree
+                />
+              </Client>
+            )
+          },
         ]
         setProcess(proce)
 
@@ -270,12 +380,13 @@ const Test = () => {
 
   const calculatedDataLength = getVisibleLength(calculatedData)
 
+  console.log(process)
 
   return (
     <div>
       <h1 className={globalStyles.title}>Test</h1>
 
-      <Procedure process={process} />
+      {process.length ? <Procedure process={process} /> : <></>}
 
       <form className={styles.kForm + ' join'} onSubmit={(e) => {
         e.preventDefault()
