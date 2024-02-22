@@ -61,7 +61,7 @@ const Predict = () => {
   const [length, setLength] = useState(1)
   const { data } = useStoreState(state => state)
   const { getData } = useStoreActions(actions => actions)
-  const [k, setK] = useState(1)
+  const [k, setK] = useState(5)
   const [process, setProcess] = useState<Process[]>([])
 
   useEffect(() => {
@@ -74,6 +74,9 @@ const Predict = () => {
 
     const processData = localStorage.getItem('proceDataPredict')
     if (processData) callProcess(JSON.parse(processData))
+
+    const k = localStorage.getItem('kPredict')
+    if (k) setK(parseInt(k))
   }, [getData])
 
   const handleFormAddPredict = (e: SyntheticEvent) => {
@@ -104,6 +107,7 @@ const Predict = () => {
   }
 
   const handleProcessPredict = () => {
+    localStorage.setItem('kPredict', k.toString())
     const model = new KNN(k)
 
     const dataTrainX = data.map(item => [item.chlo_a, item.fosfat])
@@ -448,10 +452,11 @@ const Predict = () => {
         <input
           type="number"
           className={styles.inputK + ' join-item'}
-          placeholder='Insert K here... (Default: K=1)'
+          placeholder={`Insert K here... (Default: K=${k})`}
           onChange={(e) => {
             setK(Number(e.target.value))
           }}
+          defaultValue={k}
         />
         <button
           className={styles.btnProcess + ' join-item'}

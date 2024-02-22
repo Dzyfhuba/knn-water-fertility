@@ -41,6 +41,9 @@ const Test = () => {
     }
     const proceData = localStorage.getItem('proceData')
     if (proceData) callProcess(JSON.parse(proceData))
+
+    const k = localStorage.getItem('kTest')
+    if (k) setK(parseInt(k))
   }, [])
 
   const handlePredict = () => {
@@ -95,6 +98,7 @@ const Test = () => {
           }
         })
 
+        localStorage.setItem('kTest', k.toString())
         // KNN
         const model = new KNN(k)
         // model.train(dataTrainX, dataTrainY)
@@ -403,6 +407,7 @@ const Test = () => {
           onChange={(e) => {
             setK(Number(e.target.value))
           }}
+          defaultValue={k}
         />
         <button
           type='submit'
