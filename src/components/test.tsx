@@ -38,8 +38,9 @@ const Test = () => {
       setCalculatedData(JSON.parse(dataTestXYPredict))
       setConfustionMatrix(JSON.parse(confustionMatrix))
       setDataTrain(JSON.parse(trainData))
-      // setProcess(JSON.parse(proce))
     }
+    const proceData = localStorage.getItem('proceData')
+    if (proceData) callProcess(JSON.parse(proceData))
   }, [])
 
   const handlePredict = () => {
@@ -143,228 +144,80 @@ const Test = () => {
         setCalculatedData(dataTestXYPredict)
         setConfustionMatrix(confustionMatrix)
 
+        const proceData = {
+          first: model.getDistanceBetweenData()!.map((item, idx) => ({
+            chloA: item[idx].item[0],
+            fosfat: item[idx].item[1],
+            label: item[idx].label,
+            distance: '',
+            nodes: item.sort((a, b) => a.distance - b.distance)
+              .filter(a => a.distance !== 0).map((i, idx2) => ({
+                id: i.id,
+                chloA: i.item2[0],
+                fosfat: i.item2[1],
+                label: i.label2,
+                distance: i.distance,
+                isSelected: idx2 < k,
+              }))
+          })),
+          second: model.getValidites()!.map((item, idx) => ({
+            chloA: item.data[idx][0],
+            fosfat: item.data[idx][1],
+            label: dataTrainY[idx],
+            validity: item.validity,
+            nodes: item.dataSortedByDistance.map((i, idx2) => ({
+              id: i.id,
+              chloA: i.data[0],
+              fosfat: i.data[1],
+              label: i.label,
+              validity: i.validity
+            }))
+          })),
+          third: model.getWeights()!.map((item, idx) => ({
+            chloA: item[idx].item[0],
+            fosfat: item[idx].item[1],
+            label: item[idx].label,
+            weight: model.majorityVote(
+              item.sort((a, b) => b.weight - a.weight)
+                .filter(a => a.distance !== 0).map((i, idx2) => (
+                  i.label2
+                ))
+                .slice(0, k)
+            ),
+            nodes: item.sort((a, b) => b.weight - a.weight)
+              .filter(a => a.distance !== 0).map((i, idx2) => ({
+                id: i.id,
+                chloA: i.item2[0],
+                fosfat: i.item2[1],
+                label: i.label2,
+                weight: i.weight,
+                isSelected: idx2 < k,
+              }))
+          })),
+          fourth: dataTestXYPredict.map((item, idx) => ({
+            chloA: item.chlo_a,
+            fosfat: item.fosfat,
+            label: item.kelas,
+            weight: item.kelasPredict,
+            nodes: item.weights!
+              .map((i, idx2) => ({
+                id: i.id,
+                chloA: i.data[0],
+                fosfat: i.data[1],
+                label: i.label,
+                weight: i.weight,
+                isSelected: idx2 < k
+              }))
+          }))
+        }
+        localStorage.setItem('proceData', JSON.stringify(proceData))
         // set process
-        const proce = [
-          {
-            title: 'Distance Between Train Data',
-            content: (
-              <Client>
-                <DataTable2
-                  columns={[
-                    {
-                      id: 'chloA',
-                      title: 'Chlo A',
-                      sort: false,
-                      width: 'auto',
-                    },
-                    {
-                      id: 'fosfat',
-                      title: 'Fosfat',
-                      sort: false,
-                      width: 'auto',
-                    },
-                    {
-                      id: 'label',
-                      title: 'Label',
-                      sort: false,
-                      width: 'auto',
-                    },
-                    {
-                      id: 'distance',
-                      title: 'distance',
-                      sort: false,
-                      width: 'auto',
-                    },
-                  ]}
-                  data={
-                    model.getDistanceBetweenData()!.map((item, idx) => ({
-                      chloA: item[idx].item[0],
-                      fosfat: item[idx].item[1],
-                      label: item[idx].label,
-                      distance: '',
-                      nodes: item.sort((a, b) => a.distance - b.distance)
-                        .filter(a => a.distance !== 0).map((i, idx2) => ({
-                          id: i.id,
-                          chloA: i.item2[0],
-                          fosfat: i.item2[1],
-                          label: i.label2,
-                          distance: i.distance,
-                          isSelected: idx2 < k,
-                        }))
-                    }))}
-                  enableTree
-                />
-              </Client>
-            )
-          },
-          {
-            title: 'Validasi Data Training',
-            content: (
-              <Client>
-                <DataTable2
-                  columns={[
-                    {
-                      id: 'chloA',
-                      title: 'Chlorophile A',
-                      sort: false,
-                      width: 'auto',
-                    },
-                    {
-                      id: 'fosfat',
-                      title: 'Fosfat',
-                      sort: false,
-                      width: 'auto',
-                    },
-                    {
-                      id: 'label',
-                      title: 'Label',
-                      sort: false,
-                      width: 'auto',
-                    },
-                    {
-                      id: 'validity',
-                      title: 'Validity',
-                      sort: false,
-                      width: 'auto',
-                    },
-                  ]}
-                  data={
-                    model.getValidites()!.map((item, idx) => ({
-                      chloA: item.data[idx][0],
-                      fosfat: item.data[idx][1],
-                      label: dataTrainY[idx],
-                      validity: item.validity,
-                      nodes: item.dataSortedByDistance.map((i, idx2) => ({
-                        id: i.id,
-                        chloA: i.data[0],
-                        fosfat: i.data[1],
-                        label: i.label,
-                        validity: i.validity
-                      }))
-                    }))}
-                  enableTree
-                />
-              </Client>
-            )
-          },
-          {
-            title: 'Perhitungan Weight Voting (Train)',
-            content: (
-              <Client>
-                <DataTable2
-                  columns={[
-                    {
-                      id: 'chloA',
-                      title: 'Chlorophile A',
-                      sort: false,
-                      width: 'auto',
-                    },
-                    {
-                      id: 'fosfat',
-                      title: 'Fosfat',
-                      sort: false,
-                      width: 'auto',
-                    },
-                    {
-                      id: 'label',
-                      title: 'Actual Label',
-                      sort: false,
-                      width: 'auto',
-                    },
-                    {
-                      id: 'weight',
-                      title: 'Weight / Predicted Label',
-                      sort: false,
-                      width: 'auto',
-                    },
-                  ]}
-                  data={
-                    model.getWeights()!.map((item, idx) => ({
-                      chloA: item[idx].item[0],
-                      fosfat: item[idx].item[1],
-                      label: item[idx].label,
-                      weight: model.majorityVote(
-                        item.sort((a, b) => b.weight - a.weight)
-                          .filter(a => a.distance !== 0).map((i, idx2) => (
-                            i.label2
-                          ))
-                          .slice(0, k)
-                      ),
-                      nodes: item.sort((a, b) => b.weight - a.weight)
-                        .filter(a => a.distance !== 0).map((i, idx2) => ({
-                          id: i.id,
-                          chloA: i.item2[0],
-                          fosfat: i.item2[1],
-                          label: i.label2,
-                          weight: i.weight,
-                          isSelected: idx2 < k,
-                        }))
-                    }))}
-                  enableTree
-                />
-              </Client>
-            )
-          },
-          {
-            title: 'Perhitungan Weight Voting (Test)',
-            content: (
-              <Client>
-                <DataTable2
-                  columns={[
-                    {
-                      id: 'chloA',
-                      title: 'Chlorophile A',
-                      sort: false,
-                      width: 'auto',
-                    },
-                    {
-                      id: 'fosfat',
-                      title: 'Fosfat',
-                      sort: false,
-                      width: 'auto',
-                    },
-                    {
-                      id: 'label',
-                      title: 'Actual Label',
-                      sort: false,
-                      width: 'auto',
-                    },
-                    {
-                      id: 'weight',
-                      title: 'Weight / Predicted Label',
-                      sort: false,
-                      width: 'auto',
-                    },
-                  ]}
-                  data={
-                    dataTestXYPredict.map((item, idx) => ({
-                      chloA: item.chlo_a,
-                      fosfat: item.fosfat,
-                      label: item.kelas,
-                      weight: item.kelasPredict,
-                      nodes: item.weights!
-                        .map((i, idx2) => ({
-                          id: i.id,
-                          chloA: i.data[0],
-                          fosfat: i.data[1],
-                          label: i.label,
-                          weight: i.weight,
-                          isSelected: idx2 < k
-                        }))
-                    }))}
-                  enableTree
-                />
-              </Client>
-            )
-          },
-        ]
-        setProcess(proce)
+        callProcess(proceData)
 
         // store dataTestXYPredict and confustionMatrix to localStorage
         localStorage.setItem('dataTestXYPredict', JSON.stringify(dataTestXYPredict))
         localStorage.setItem('confustionMatrix', JSON.stringify(confustionMatrix))
         localStorage.setItem('trainData', JSON.stringify(dataTrain))
-        localStorage.setItem('testProcess', JSON.stringify(proce))
       }
 
     } catch (error) {
@@ -376,6 +229,157 @@ const Test = () => {
         ...SweetalertParams.error
       })
     }
+  }
+
+  function callProcess(proceData: { first: { chloA: number; fosfat: number; label: Label; distance: string; nodes: { id: string | number; chloA: number; fosfat: number; label: Label; distance: number; isSelected: boolean }[] }[]; second: { chloA: number; fosfat: number; label: Label; validity: number; nodes: { id: string | number; chloA: number; fosfat: number; label: Label; validity: number }[] }[]; third: { chloA: number; fosfat: number; label: Label; weight: Label; nodes: { id: string | number; chloA: number; fosfat: number; label: Label; weight: number; isSelected: boolean }[] }[]; fourth: { chloA: number; fosfat: number; label: Label; weight: Label; nodes: { id: string | number; chloA: number; fosfat: number; label: Label; weight: number; isSelected: boolean }[] }[] }) {
+    const proce = [
+      {
+        title: 'Distance Between Train Data',
+        content: (
+          <Client>
+            <DataTable2
+              columns={[
+                {
+                  id: 'chloA',
+                  title: 'Chlo A',
+                  sort: false,
+                  width: 'auto',
+                },
+                {
+                  id: 'fosfat',
+                  title: 'Fosfat',
+                  sort: false,
+                  width: 'auto',
+                },
+                {
+                  id: 'label',
+                  title: 'Label',
+                  sort: false,
+                  width: 'auto',
+                },
+                {
+                  id: 'distance',
+                  title: 'distance',
+                  sort: false,
+                  width: 'auto',
+                },
+              ]}
+              data={proceData.first}
+              enableTree />
+          </Client>
+        )
+      },
+      {
+        title: 'Validasi Data Training',
+        content: (
+          <Client>
+            <DataTable2
+              columns={[
+                {
+                  id: 'chloA',
+                  title: 'Chlorophile A',
+                  sort: false,
+                  width: 'auto',
+                },
+                {
+                  id: 'fosfat',
+                  title: 'Fosfat',
+                  sort: false,
+                  width: 'auto',
+                },
+                {
+                  id: 'label',
+                  title: 'Label',
+                  sort: false,
+                  width: 'auto',
+                },
+                {
+                  id: 'validity',
+                  title: 'Validity',
+                  sort: false,
+                  width: 'auto',
+                },
+              ]}
+              data={proceData.second}
+              enableTree />
+          </Client>
+        )
+      },
+      {
+        title: 'Perhitungan Weight Voting (Train)',
+        content: (
+          <Client>
+            <DataTable2
+              columns={[
+                {
+                  id: 'chloA',
+                  title: 'Chlorophile A',
+                  sort: false,
+                  width: 'auto',
+                },
+                {
+                  id: 'fosfat',
+                  title: 'Fosfat',
+                  sort: false,
+                  width: 'auto',
+                },
+                {
+                  id: 'label',
+                  title: 'Actual Label',
+                  sort: false,
+                  width: 'auto',
+                },
+                {
+                  id: 'weight',
+                  title: 'Weight / Predicted Label',
+                  sort: false,
+                  width: 'auto',
+                },
+              ]}
+              data={proceData.third}
+              enableTree />
+          </Client>
+        )
+      },
+      {
+        title: 'Perhitungan Weight Voting (Test)',
+        content: (
+          <Client>
+            <DataTable2
+              columns={[
+                {
+                  id: 'chloA',
+                  title: 'Chlorophile A',
+                  sort: false,
+                  width: 'auto',
+                },
+                {
+                  id: 'fosfat',
+                  title: 'Fosfat',
+                  sort: false,
+                  width: 'auto',
+                },
+                {
+                  id: 'label',
+                  title: 'Actual Label',
+                  sort: false,
+                  width: 'auto',
+                },
+                {
+                  id: 'weight',
+                  title: 'Weight / Predicted Label',
+                  sort: false,
+                  width: 'auto',
+                },
+              ]}
+              data={proceData.fourth}
+              enableTree />
+          </Client>
+        )
+      },
+    ]
+    setProcess(proce)
+    return proce
   }
 
   const calculatedDataLength = getVisibleLength(calculatedData)
