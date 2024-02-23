@@ -86,6 +86,17 @@ const removeDuplicates = <T>(array: T[], key: keyof T) => {
   )
 }
 
+function removeDuplicatesLevel1(arr: number[]) {
+  // Use a Set to keep track of unique elements
+  const uniqueElements = new Set(arr)
+
+  // Convert the Set back to an array
+  const resultArray = Array.from(uniqueElements)
+
+  return resultArray
+}
+
+
 // storage path
 const assetUrl = (path: string) => {
   return `${process.env.NEXT_PUBLIC_SUPABASE_URL}${path}`
@@ -133,7 +144,7 @@ function findArrayDifferences(arr1: string[], arr2: string[]) {
 
 export {
   assetUrl, capitalize, getFirstPath,
-  getFullPath, getHost, getURLWithoutQuery,
+  getFullPath, getHost, getURLWithoutQuery, removeDuplicatesLevel1,
   getURLWithoutQueryAndLastPath, isValidDate, removeDuplicates, slugify,
   removeLastPathAndSecondLastPathIfSame, setQueryParams, findArrayDifferences,
   getURLWithQuery

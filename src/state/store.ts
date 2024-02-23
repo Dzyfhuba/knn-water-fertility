@@ -28,6 +28,9 @@ export interface GlobalState {
 
   theme: 'light' | 'dark'
   setTheme: Action<GlobalState, 'light' | 'dark'>
+
+  setSelectedDataTest: Action<GlobalState, number[]>
+  selectedDataTest: number[]
 }
 
 const store = createStore<GlobalState>({
@@ -169,6 +172,11 @@ const store = createStore<GlobalState>({
   theme: detectColorScheme(),
   setTheme: action((state, payload) => {
     state.theme = payload
+  }),
+
+  selectedDataTest: [],
+  setSelectedDataTest: action((state, payload) => {
+    state.selectedDataTest = payload
   })
 })
 

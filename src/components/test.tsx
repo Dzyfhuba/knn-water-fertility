@@ -1,24 +1,33 @@
 'use client'
-import { useStoreState } from '@/state/hooks'
 import globalStyles from '@/app/global.module.css'
-import KNN, { ConfusionMatrix, Label } from '@/variables/knn'
-import styles from './test.module.css'
-import { useEffect, useState } from 'react'
-import DataTable from './datatable'
+import { useStoreActions, useStoreState } from '@/state/hooks'
 import DataRaw from '@/types/data-raw'
-import Swal from 'sweetalert2'
-import SweetalertParams from '@/variables/sweetalert2'
-import kFoldCrossValidation from '@/variables/validation'
-import { TableNode } from '@table-library/react-table-library/types/table'
-import getVisibleLength from '@/variables/visibleLength'
-import Procedure from './procedure'
 import Process from '@/types/procedure'
-import DataTable2 from './dataTable2'
+import { removeDuplicatesLevel1 } from '@/variables/helpers'
+import KNN, { ConfusionMatrix, Label } from '@/variables/knn'
+import SweetalertParams from '@/variables/sweetalert2'
+import getVisibleLength from '@/variables/visibleLength'
+import {
+  SelectClickTypes,
+} from '@table-library/react-table-library/select'
+import { MiddlewareFunction } from '@table-library/react-table-library/types/common'
+import { TableNode } from '@table-library/react-table-library/types/table'
+import { useEffect, useState } from 'react'
+import { CiPickerHalf } from 'react-icons/ci'
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
 import Client from './client'
+import DataTable2 from './dataTable2'
+import DataTable from './datatable'
+import Loading from './loading'
+import Procedure from './procedure'
+import styles from './test.module.css'
+import { MdClear } from 'react-icons/md'
 
 
 const Test = () => {
-  const { dataPartial: dataPartialState } = useStoreState(state => state)
+  const { dataPartial: dataPartialState, selectedDataTest, data } = useStoreState(state => state)
+  const { setSelectedDataTest, getData } = useStoreActions(actions => actions)
   const [calculatedData, setCalculatedData] = useState<DataRaw.Select[]>([])
   const [confustionMatrix, setConfustionMatrix] = useState<ConfusionMatrix>({})
   const [indexTrain, setIndexTrain] = useState<number[]>([])
@@ -29,6 +38,7 @@ const Test = () => {
   const [process, setProcess] = useState<Process[]>([])
 
   useEffect(() => {
+    getData()
     const dataTestXYPredict = localStorage.getItem('dataTestXYPredict')
     const confustionMatrix = localStorage.getItem('confustionMatrix')
     const trainData = localStorage.getItem('trainData')
@@ -44,7 +54,10 @@ const Test = () => {
 
     const k = localStorage.getItem('kTest')
     if (k) setK(parseInt(k))
-  }, [])
+
+    const selectedDataTest = localStorage.getItem('selectedDataTest')
+    if (selectedDataTest) setSelectedDataTest(JSON.parse(selectedDataTest))
+  }, [getData])
 
   const handlePredict = () => {
     try {
@@ -62,7 +75,12 @@ const Test = () => {
 
         // get dataTrain and dataTest
         let dataTrain = dataPartial.filter((item, index) => indexTrain.includes(index)).flat()
-        const dataTest = temp[indexTest]
+        let dataTest = temp[indexTest]
+
+        if (selectedDataTest.length) {
+          dataTrain = data.filter(item => !selectedDataTest.includes(item.id!))
+          dataTest = data.filter(item => selectedDataTest.includes(item.id!))
+        }
 
         // sort dataTrain
         dataTrain = dataTrain.sort((a, b) => a.id! - b.id!)
@@ -70,14 +88,14 @@ const Test = () => {
         setDataTrain(dataTrain)
 
 
-        // console.log({ dataTrain })
-        // console.log({ dataTest })
+        console.log({ dataTrain })
+        console.log({ dataTest })
 
         // console.log({ indexTrain })
         // console.log({ indexTest })
 
         setIndexTrain(indexTrain)
-        setIndexTest(dataPartial.findIndex(item => item === dataTest))
+        setIndexTest(selectedDataTest.length ? -1 : dataPartial.findIndex(item => item === dataTest))
 
         const dataTrainX = dataTrain.map(item => [item.chlo_a as number, item.fosfat as number])
         const dataTrainY = dataTrain.map(item => item.kelas as Label)
@@ -388,8 +406,20 @@ const Test = () => {
 
   const calculatedDataLength = getVisibleLength(calculatedData)
 
-  console.log(process)
+  const ReactSwal = withReactContent(Swal)
 
+  const handlePick = () => {
+    ReactSwal.fire({
+      title: 'Pilih data test',
+      text: 'Disarankan pilih 10% sampai 25% jumlah data yang ada.',
+      html: (
+        <Client>
+          <HandlePick />
+        </Client>
+      )
+    })
+  }
+  console.log(data.filter(a => selectedDataTest.includes(a.id!)))
   return (
     <div>
       <h1 className={globalStyles.title}>Test</h1>
@@ -409,12 +439,24 @@ const Test = () => {
           }}
           defaultValue={k}
         />
+        {selectedDataTest.length ? <button type='button' className={styles.btnClear + ' sm:join-item w-full sm:w-max'}
+          onClick={() => {
+            setSelectedDataTest([])
+          }}
+        >
+          <MdClear size={24} />
+        </button> : <></>}
         <button
           type='submit'
           className={styles.testButton + ' sm:join-item w-full sm:w-max'}
           disabled={!!!(k % 2)}
         >
-          Predict With Test Data
+          {`Predict With ${selectedDataTest.length ? 'Choosen' : 'Random'} Test Data`}
+        </button>
+        <button type='button' className={styles.btnPick + ' sm:join-item w-full sm:w-max'}
+          onClick={handlePick}
+        >
+          <CiPickerHalf size={24} />
         </button>
       </form>
 
@@ -437,7 +479,14 @@ const Test = () => {
       <h2>Hasil Prediksi Data Test</h2>
       <p>Length: {calculatedData.length}</p>
       <DataTable
-        tableData={{ nodes: calculatedData as TableNode[] }}
+        tableData={{
+          nodes:
+            (selectedDataTest.length
+              ? data
+                .filter(a => selectedDataTest.includes(a.id!))
+                .map((a, idx) => ({ ...a, kelasPredict: calculatedData[idx].kelasPredict || ' ' }))
+              : calculatedData) as TableNode[]
+        }}
         length={calculatedDataLength}
       />
 
@@ -445,6 +494,84 @@ const Test = () => {
       <p>Length: {dataTrain.length}</p>
       <DataTable tableData={{ nodes: dataTrain as TableNode[] }} />
     </div>
+  )
+}
+
+const HandlePick = () => {
+  const { getData, setSelectedDataTest } = useStoreActions((actions) => actions)
+  const { data, isLoading, selectedDataTest } = useStoreState((state) => state)
+  const [ids, setIds] = useState<number[]>([])
+
+  useEffect(() => {
+    getData()
+    const selectedDataTest = localStorage.getItem('selectedDataTest')
+    if (selectedDataTest) setIds(JSON.parse(selectedDataTest))
+  }, [getData, setIds])
+
+  const handleSelect = (
+    action: {
+      payload: {
+        ids: number[]
+        options: {
+          isCarryForward: boolean
+          isPartialToAll: boolean
+        }
+      }
+    },
+    state: {
+      id: null
+      ids: number[]
+    }
+  ) => {
+    const ids = removeDuplicatesLevel1(state.ids)
+    localStorage.setItem('selectedDataTest', JSON.stringify(ids))
+    setSelectedDataTest(ids)
+    setIds(ids)
+  }
+
+  const percent10 = Math.floor(data.length / 10)
+  const percent25 = Math.floor(data.length / 4)
+
+  return (
+    <>
+      <p>{`Terpilih: ${ids.length}`}</p>
+      <div className='join'>
+        <button
+          className={styles.btnClear + ' join-item'}
+          onClick={() => {
+            setIds([])
+            setSelectedDataTest([])
+            Swal.close()
+          }}
+        >
+          <MdClear size={24} />
+        </button>
+        <button
+          className={styles.btnChoose + ' join-item'}
+          disabled={!(percent10 <= ids.length && ids.length <= percent25)}
+          onClick={() => {
+            Swal.close()
+          }}
+        >
+          {percent10 <= ids.length && ids.length <= percent25 ? 'Confirm' : `Pilih 10%(${percent10}) sampai 25%(${percent25})`}
+        </button>
+      </div>
+      {
+        !isLoading ? (
+          data.length ? <DataTable
+            tableData={{ nodes: data as TableNode[] }}
+            onSelect={handleSelect as unknown as MiddlewareFunction}
+            enableSelect
+            defaultSelects={ids}
+            clickType={SelectClickTypes.RowClick}
+          /> : <span>No Data</span>
+        ) : (
+          <div className={styles.loadingContainer}>
+            <Loading size='lg' />
+          </div>
+        )
+      }
+    </>
   )
 }
 

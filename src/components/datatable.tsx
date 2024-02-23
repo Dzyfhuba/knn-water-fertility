@@ -27,8 +27,11 @@ import {
   HeaderCellSelect,
   CellSelect,
   useRowSelect,
+  SelectClickTypes,
+  SelectTypes,
 } from '@table-library/react-table-library/select'
 import { useEffect, useState } from 'react'
+import Loading from './loading'
 
 
 type Props = {
@@ -36,10 +39,15 @@ type Props = {
   length?: number
   downloadable?: boolean
   onSelect?: MiddlewareFunction
+  defaultSelects?: number[]
   enableSelect?: boolean
+  disableOnClick?: boolean,
+  clickType?: SelectClickTypes
 }
 
 const DataTable = (props: Props) => {
+  const [defaultState, setDefaultState] = useState<number[]>(props.defaultSelects || [])
+
   const finalLength = ((props.length || 4) - (props.enableSelect ? 0 : 1))
 
   const theme = useTheme({
@@ -75,6 +83,10 @@ const DataTable = (props: Props) => {
 
   const select = useRowSelect(props.tableData, {
     onChange: onSelectChange,
+    state: { ids: defaultState }
+  }, {
+    clickType: props.clickType,
+    rowSelect: props.clickType === SelectClickTypes.RowClick ? SelectTypes.MultiSelect : undefined,
   })
 
   const sort = useSort(props.tableData, {
@@ -159,7 +171,9 @@ const DataTable = (props: Props) => {
                 <Row
                   key={item.id}
                   item={item as TableNode}
-                  onClick={() => {
+                  onClick={(props.clickType === SelectClickTypes.RowClick) ? () => {
+
+                  } : () => {
                     ReactSwal.fire({
                       title: 'Data',
                       html: (
@@ -255,7 +269,7 @@ const DataTable = (props: Props) => {
                       ...SweetalertParams.info
                     })
                   }}
-                  className='hover:cursor-pointer'
+                  className={props.clickType === SelectClickTypes.ButtonClick ? 'hover:!cursor-default' : 'hover:cursor-pointer'}
                 >
                   {
                     props.enableSelect ? <CellSelect item={item as TableNode} /> : <></>

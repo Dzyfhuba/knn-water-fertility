@@ -93,7 +93,7 @@ class KNN {
           distance: this.distance(item, item2)
         }))
       })
-      console.log(this.distanceBetweenData)
+      // console.log(this.distanceBetweenData)
 
       // 2
       this.validities = this.distanceBetweenData.map(item => {
@@ -117,7 +117,7 @@ class KNN {
             }))
         }
       })
-      console.log(this.validities)
+      // console.log(this.validities)
 
       // 3
       this.weights = this.distanceBetweenData.map(item => {
@@ -126,7 +126,7 @@ class KNN {
           ...item2,
         }))
       })
-      console.log(this.weights)
+      // console.log(this.weights)
     },
     predict: (data: Feature[]) => {
       if (!this.weights) throw new Error('Please call `weighted.train` before `predict`.')
@@ -140,13 +140,13 @@ class KNN {
           weight: this.validities![idx2].validity / (this.distance(item, item2) + 0.5)
         }))
       })
-      console.log(this.weightTests)
+      // console.log(this.weightTests)
 
       // order weight voting descending
       this.sortedWeightTest = this.weightTests.map((items, idx) => {
         return _.orderBy(items, 'weight', 'desc')
       })
-      console.log(this.sortedWeightTest)
+      // console.log(this.sortedWeightTest)
 
       // get predicted label
       const labels = this.sortedWeightTest.map((items, idx) => ({
@@ -160,7 +160,7 @@ class KNN {
         label: this.majorityVote(items.map(item =>
           item.label2).slice(0, this.k))
       }))
-      console.log(labels)
+      // console.log(labels)
 
       return labels
     }
@@ -244,7 +244,7 @@ class KNN {
       }
     })
 
-    console.log(predictions)
+    // console.log(predictions)
 
     return { predictions }
   }
@@ -254,7 +254,7 @@ class KNN {
     if (!this.features || !this.labels) {
       throw new Error('train the model first')
     }
-    console.log({ data, actual })
+    // console.log({ data, actual })
     if (data.length !== actual.length) {
       throw new Error('data and labels must have same length')
     }

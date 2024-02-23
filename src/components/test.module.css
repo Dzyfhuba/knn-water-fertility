@@ -11,7 +11,7 @@
 }
 
 .kForm {
-  @apply block
+  @apply flex items-center flex-col sm:flex-row gap-3 sm:gap-0
 }
 
 .inputK {
@@ -20,4 +20,20 @@
 
 .btnSubmit {
   @apply btn btn-success
+}
+
+.btnPick {
+  @apply btn btn-square btn-secondary items-center w-full sm:w-11
+}
+
+.title {
+  @apply font-bold text-xl
+}
+
+.btnChoose {
+  @apply btn btn-primary w-full
+}
+
+.btnClear {
+  @apply btn btn-square btn-error
 }
