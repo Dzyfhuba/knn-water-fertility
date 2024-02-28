@@ -46,6 +46,7 @@ type Props = {
 }
 
 const DataTable = (props: Props) => {
+  console.log(props.tableData)
   const [defaultState, setDefaultState] = useState<number[]>(props.defaultSelects || [])
 
   const finalLength = ((props.length || 4) - (props.enableSelect ? 0 : 1))

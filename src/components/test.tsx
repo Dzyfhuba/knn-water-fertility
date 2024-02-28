@@ -517,23 +517,9 @@ const HandlePick = (props: {onSubmit: () => void}) => {
     if (selectedDataTest) setIds(JSON.parse(selectedDataTest))
   }, [getData, setIds])
 
-  const handleSelect = (
-    action: {
-      payload: {
-        ids: number[]
-        options: {
-          isCarryForward: boolean
-          isPartialToAll: boolean
-        }
-      }
-    },
-    state: {
-      id: null
-      ids: number[]
-    }
-  ) => {
-    const ids = removeDuplicatesLevel1(state.ids)
-    setIds(ids)
+  const handleSelect = (ids: number[]) => {
+    const asd = removeDuplicatesLevel1(ids)
+    setIds(asd)
   }
 
   const percent10 = Math.floor(data.length / 10)
@@ -556,9 +542,50 @@ const HandlePick = (props: {onSubmit: () => void}) => {
       </button>
       {
         !isLoading ? (
-          data.length ? <DataTable
-            tableData={{ nodes: data as TableNode[] }}
-            onSelect={handleSelect as unknown as MiddlewareFunction}
+          data.length ? <DataTable2
+            columns={[
+              {
+                id: 'id',
+                title: 'ID',
+                sort: true,
+                width: 'max-content',
+                hide: true
+              },
+              {
+                id: 'chlo_a',
+                title: 'Klorofil A',
+                sort: true,
+                width: 'auto'
+              },
+              {
+                id: 'fosfat',
+                title: 'Fosfat',
+                sort: true,
+                width: 'auto'
+              },
+              {
+                id: 'kelas',
+                title: 'Actual',
+                sort: true,
+                width: 'auto'
+              },
+              {
+                id: 'created_at',
+                title: 'Created at',
+                sort: true,
+                width: 'auto',
+                hide: true
+              },
+              {
+                id: 'updated_at',
+                title: 'Updated At',
+                sort: true,
+                width: 'auto',
+                hide: true
+              },
+            ]}
+            data={data as TableNode[]}
+            onSelectChange={handleSelect}
             enableSelect
             defaultSelects={ids}
             clickType={SelectClickTypes.RowClick}

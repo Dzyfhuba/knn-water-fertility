@@ -73,6 +73,9 @@ type Props<T> = {
   lazy?: boolean,
   remainingData?: boolean,
   enableTree?: boolean
+  defaultSelects?: number[]
+  disableOnClick?: boolean,
+  clickType?: SelectClickTypes
 }
 
 const DataTable2 = <T extends object>(props: Props<T>) => {
