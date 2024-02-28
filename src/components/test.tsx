@@ -34,6 +34,7 @@ const Test = () => {
   const [indexTest, setIndexTest] = useState<number>(0)
   const [dataTrain, setDataTrain] = useState<DataRaw.Select[]>([])
   const [k, setK] = useState(5)
+  const [isPredicted, setPredicted] = useState(false)
 
   const [process, setProcess] = useState<Process[]>([])
 
@@ -60,8 +61,8 @@ const Test = () => {
     const k = localStorage.getItem('kTest')
     if (k) setK(parseInt(k))
 
-    const selectedDataTest = localStorage.getItem('selectedDataTest')
-    if (selectedDataTest) setSelectedDataTest(JSON.parse(selectedDataTest))
+    const selectedDataTestLocal = localStorage.getItem('selectedDataTest')
+    if (selectedDataTestLocal) setSelectedDataTest(JSON.parse(selectedDataTestLocal))
   }, [getData])
 
   const handlePredict = () => {
@@ -167,7 +168,7 @@ const Test = () => {
 
         // sort dataTestXYPredict
         dataTestXYPredict.sort((a, b) => a.id! - b.id!)
-
+        setPredicted(true)
         setCalculatedData(dataTestXYPredict)
         setConfustionMatrix(confustionMatrix)
 
@@ -419,7 +420,7 @@ const Test = () => {
       text: 'Disarankan pilih 10% sampai 25% jumlah data yang ada.',
       html: (
         <Client>
-          <HandlePick />
+          <HandlePick onSubmit={() => setPredicted(false)} />
         </Client>
       )
     })
@@ -430,6 +431,12 @@ const Test = () => {
       <h1 className={globalStyles.title}>Test</h1>
 
       {process.length ? <Procedure process={process} /> : <></>}
+
+      <button type='button' className={styles.btnPick + ' w-full sm:w-max mb-3'}
+        onClick={handlePick}
+      >
+        <CiPickerHalf size={24} />
+      </button>
 
       <form className={styles.kForm + ' join'} onSubmit={(e) => {
         e.preventDefault()
@@ -458,11 +465,6 @@ const Test = () => {
         >
           {`Predict With ${selectedDataTest.length ? 'Choosen' : 'Random'} Test Data`}
         </button>
-        <button type='button' className={styles.btnPick + ' sm:join-item w-full sm:w-max'}
-          onClick={handlePick}
-        >
-          <CiPickerHalf size={24} />
-        </button>
       </form>
 
 
@@ -489,7 +491,7 @@ const Test = () => {
             (selectedDataTest.length
               ? data
                 .filter(a => selectedDataTest.includes(a.id!))
-                .map((a, idx) => ({ ...a, kelasPredict: calculatedData.length ? calculatedData[idx].kelasPredict : ' ' }))
+                .map((a, idx) => ({ ...a, kelasPredict: isPredicted ? calculatedData[idx].kelasPredict : ' ' }))
               : calculatedData) as TableNode[]
         }}
         length={calculatedDataLength}
@@ -504,7 +506,7 @@ const Test = () => {
   )
 }
 
-const HandlePick = () => {
+const HandlePick = (props: {onSubmit: () => void}) => {
   const { getData, setSelectedDataTest } = useStoreActions((actions) => actions)
   const { data, isLoading, selectedDataTest } = useStoreState((state) => state)
   const [ids, setIds] = useState<number[]>([])
@@ -531,8 +533,6 @@ const HandlePick = () => {
     }
   ) => {
     const ids = removeDuplicatesLevel1(state.ids)
-    localStorage.setItem('selectedDataTest', JSON.stringify(ids))
-    setSelectedDataTest(ids)
     setIds(ids)
   }
 
@@ -542,27 +542,18 @@ const HandlePick = () => {
   return (
     <>
       <p>{`Terpilih: ${ids.length}`}</p>
-      <div className='join'>
-        <button
-          className={styles.btnClear + ' join-item'}
-          onClick={() => {
-            setIds([])
-            setSelectedDataTest([])
-            Swal.close()
-          }}
-        >
-          <MdClear size={24} />
-        </button>
-        <button
-          className={styles.btnChoose + ' join-item'}
-          disabled={!(percent10 <= ids.length && ids.length <= percent25)}
-          onClick={() => {
-            Swal.close()
-          }}
-        >
-          {percent10 <= ids.length && ids.length <= percent25 ? 'Confirm' : `Pilih 10%(${percent10}) sampai 25%(${percent25})`}
-        </button>
-      </div>
+      <button
+        className={styles.btnChoose + ' join-item'}
+        disabled={!(percent10 <= ids.length && ids.length <= percent25)}
+        onClick={() => {
+          Swal.close()
+          localStorage.setItem('selectedDataTest', JSON.stringify(ids))
+          props.onSubmit()
+          setSelectedDataTest(ids)
+        }}
+      >
+        {percent10 <= ids.length && ids.length <= percent25 ? 'Confirm' : `Pilih 10%(${percent10}) sampai 25%(${percent25})`}
+      </button>
       {
         !isLoading ? (
           data.length ? <DataTable
