@@ -27,7 +27,7 @@ import { MdClear } from 'react-icons/md'
 
 const Test = () => {
   const { dataPartial: dataPartialState, selectedDataTest, data } = useStoreState(state => state)
-  const { setSelectedDataTest, getData } = useStoreActions(actions => actions)
+  const { setSelectedDataTest, getData, separateData, } = useStoreActions(actions => actions)
   const [calculatedData, setCalculatedData] = useState<DataRaw.Select[]>([])
   const [confustionMatrix, setConfustionMatrix] = useState<ConfusionMatrix>({})
   const [indexTrain, setIndexTrain] = useState<number[]>([])
@@ -38,7 +38,12 @@ const Test = () => {
   const [process, setProcess] = useState<Process[]>([])
 
   useEffect(() => {
-    getData()
+    const promise1 = () => new Promise((resolve) => resolve(getData()))
+    const promise2 = () => new Promise((resolve) => resolve(separateData()))
+    const promise3 = () => new Promise((resolve) => resolve(handlePredict()))
+
+    promise1().then(async () => await promise2().then(async () => await promise3()))
+
     const dataTestXYPredict = localStorage.getItem('dataTestXYPredict')
     const confustionMatrix = localStorage.getItem('confustionMatrix')
     const trainData = localStorage.getItem('trainData')
@@ -484,7 +489,7 @@ const Test = () => {
             (selectedDataTest.length
               ? data
                 .filter(a => selectedDataTest.includes(a.id!))
-                .map((a, idx) => ({ ...a, kelasPredict: calculatedData[idx].kelasPredict || ' ' }))
+                .map((a, idx) => ({ ...a, kelasPredict: calculatedData.length ? calculatedData[idx].kelasPredict : ' ' }))
               : calculatedData) as TableNode[]
         }}
         length={calculatedDataLength}
@@ -492,7 +497,9 @@ const Test = () => {
 
       <h2>Train Data</h2>
       <p>Length: {dataTrain.length}</p>
-      <DataTable tableData={{ nodes: dataTrain as TableNode[] }} />
+      {dataTrain.length ? (
+        <DataTable tableData={{ nodes: dataTrain as TableNode[] }} />
+      ) : <></>}
     </div>
   )
 }
